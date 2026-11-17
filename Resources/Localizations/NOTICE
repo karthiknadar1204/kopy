@@ -1,0 +1,10 @@
+Kopy incorporates modified interface translations from Edge-Drop.
+
+Upstream: https://github.com/Deepender25/Edge-Drop
+Source revision: 31ac86cfabed483960ef985e671074500df779f2
+Copyright: Edge-Drop contributors
+License: Apache License, Version 2.0 (see LICENSE).
+
+Kopy selects the translations that apply to its macOS controls, changes the
+English source keys to match Kopy's interface, and substitutes the Kopy name
+where it appears in translated welcome titles.
