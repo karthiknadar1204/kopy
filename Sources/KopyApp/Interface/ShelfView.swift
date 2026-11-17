@@ -163,6 +163,7 @@ struct ShelfView: View {
 
     private var toolbarActions: some View {
         HStack(spacing: 1) {
+#if !KOPY_APP_STORE
             switch model.updater.state {
             case .available, .ready:
                 ShelfIconButton(title: "Update available", symbol: "arrow.down.circle.fill") {
@@ -172,6 +173,7 @@ struct ShelfView: View {
             default:
                 EmptyView()
             }
+#endif
             ShelfIconButton(title: "Import clipboard", symbol: "document.on.clipboard") { model.importClipboard() }
             ShelfIconButton(title: "Emoji", symbol: "face.smiling") {
                 searchFocused = false

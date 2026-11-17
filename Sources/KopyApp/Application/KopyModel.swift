@@ -24,7 +24,9 @@ final class KopyModel {
     var isDropTargeted = false
     var message: String?
     let isDemo: Bool
+#if !KOPY_APP_STORE
     let updater: KopyUpdater
+#endif
     private let isolatedProfile: URL?
 
     @ObservationIgnored let clipboard = ClipboardController()
@@ -52,7 +54,9 @@ final class KopyModel {
         isDemo = demo
         self.isolatedProfile = isolatedProfile
         defaults = isolatedProfile.map { UserDefaults(suiteName: "Kopy.Test.\($0.lastPathComponent)") ?? .standard } ?? .standard
+#if !KOPY_APP_STORE
         updater = KopyUpdater(enabled: !demo && isolatedProfile == nil, defaults: defaults)
+#endif
         if demo {
             items = Self.examples
             expandedPinnedFilters = Set(ClipboardFilter.allCases.map(\.rawValue))

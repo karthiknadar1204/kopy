@@ -25,7 +25,6 @@ mkdir -p "$contents/MacOS" "$contents/Resources" "$contents/Frameworks"
 install -m 755 "$bin_dir/Kopy" "$contents/MacOS/Kopy"
 plist="$contents/Info.plist"
 install -m 644 Scripts/Info.plist "$plist"
-install -m 644 Resources/Kopy.icns "$contents/Resources/Kopy.icns"
 if [[ -n "$feed_url" ]]; then
     plutil -insert SUFeedURL -string "$feed_url" "$plist"
     plutil -insert SUPublicEDKey -string "$public_key" "$plist"
@@ -40,15 +39,7 @@ fi
 framework="$contents/Frameworks/Sparkle.framework"
 rm -rf "$framework"
 ditto "$bin_dir/Sparkle.framework" "$framework"
-for localization in Resources/Localizations/*.lproj; do
-    if [[ -d "$localization" ]]; then cp -R "$localization" "$contents/Resources/"; fi
-done
-if [[ -d Resources/Emoji ]]; then cp -R Resources/Emoji "$contents/Resources/"; fi
-for notice in LICENSE NOTICE; do
-    if [[ -f "Resources/Localizations/$notice" ]]; then
-        install -m 644 "Resources/Localizations/$notice" "$contents/Resources/Localizations-$notice"
-    fi
-done
+Scripts/stage-app-resources.sh "$contents/Resources"
 if [[ "$identity" == - ]]; then
     codesign --force --sign - "$bundle"
 else

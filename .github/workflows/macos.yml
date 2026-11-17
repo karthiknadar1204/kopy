@@ -1,0 +1,27 @@
+name: macOS builds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test direct build
+        run: swift test
+      - name: Archive App Store target
+        run: |
+          xcodebuild archive -project Store/KopyStore.xcodeproj -scheme KopyStore \
+            -destination 'generic/platform=macOS' -archivePath "$RUNNER_TEMP/Kopy.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Inspect archived app
+        run: |
+          app="$RUNNER_TEMP/Kopy.xcarchive/Products/Applications/Kopy.app"
+          codesign --force --sign - --entitlements Store/Kopy.entitlements "$app"
+          Scripts/check-store-bundle.sh "$app"

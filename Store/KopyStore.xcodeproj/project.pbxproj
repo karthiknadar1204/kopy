@@ -1,0 +1,193 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {};
+    objectVersion = 77;
+    objects = {
+        A00000000000000000000001 = {
+            isa = PBXProject;
+            attributes = {
+                LastSwiftUpdateCheck = 1630;
+                LastUpgradeCheck = 1630;
+                TargetAttributes = { A00000000000000000000008 = { SystemCapabilities = { com.apple.Sandbox = { enabled = 1; }; }; }; };
+            };
+            buildConfigurationList = A0000000000000000000000E;
+            developmentRegion = en;
+            knownRegions = (en, Base);
+            mainGroup = A00000000000000000000002;
+            productRefGroup = A00000000000000000000003;
+            preferredProjectObjectVersion = 77;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (A00000000000000000000008, A00000000000000000000009);
+        };
+        A00000000000000000000002 = {
+            isa = PBXGroup;
+            children = (A00000000000000000000004, A00000000000000000000005, A00000000000000000000003);
+            sourceTree = "<group>";
+        };
+        A00000000000000000000003 = {
+            isa = PBXGroup;
+            children = (A00000000000000000000006, A00000000000000000000007);
+            name = Products;
+            sourceTree = "<group>";
+        };
+        A00000000000000000000004 = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            name = KopyApp;
+            path = ../Sources/KopyApp;
+            sourceTree = "<group>";
+        };
+        A00000000000000000000005 = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            name = KopyCore;
+            path = ../Sources/KopyCore;
+            sourceTree = "<group>";
+        };
+        A00000000000000000000006 = {
+            isa = PBXFileReference;
+            explicitFileType = wrapper.application;
+            path = Kopy.app;
+            sourceTree = BUILT_PRODUCTS_DIR;
+        };
+        A00000000000000000000007 = {
+            isa = PBXFileReference;
+            explicitFileType = archive.ar;
+            path = libKopyCore.a;
+            sourceTree = BUILT_PRODUCTS_DIR;
+        };
+        A00000000000000000000008 = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A0000000000000000000000F;
+            buildPhases = (A0000000000000000000000A, A0000000000000000000000B, A0000000000000000000000C);
+            buildRules = ();
+            dependencies = (A00000000000000000000017);
+            fileSystemSynchronizedGroups = (A00000000000000000000004);
+            name = KopyStore;
+            productName = Kopy;
+            productReference = A00000000000000000000006;
+            productType = "com.apple.product-type.application";
+        };
+        A00000000000000000000009 = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A00000000000000000000010;
+            buildPhases = (A0000000000000000000000D);
+            buildRules = ();
+            dependencies = ();
+            fileSystemSynchronizedGroups = (A00000000000000000000005);
+            name = KopyCore;
+            productName = KopyCore;
+            productReference = A00000000000000000000007;
+            productType = "com.apple.product-type.library.static";
+        };
+        A0000000000000000000000A = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = ();
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A0000000000000000000000B = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (A00000000000000000000018);
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A0000000000000000000000C = {
+            isa = PBXShellScriptBuildPhase;
+            alwaysOutOfDate = 1;
+            buildActionMask = 2147483647;
+            files = ();
+            name = "Copy Kopy resources";
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/bash;
+            shellScript = "\"$SRCROOT/../Scripts/stage-app-resources.sh\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
+        };
+        A0000000000000000000000D = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = ();
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        A0000000000000000000000E = {
+            isa = XCConfigurationList;
+            buildConfigurations = (A00000000000000000000011, A00000000000000000000012);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A0000000000000000000000F = {
+            isa = XCConfigurationList;
+            buildConfigurations = (A00000000000000000000013, A00000000000000000000014);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A00000000000000000000010 = {
+            isa = XCConfigurationList;
+            buildConfigurations = (A00000000000000000000015, A00000000000000000000016);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        A00000000000000000000011 = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = A0000000000000000000001A;
+            buildSettings = { SWIFT_OPTIMIZATION_LEVEL = "-Onone"; ONLY_ACTIVE_ARCH = YES; };
+            name = Debug;
+        };
+        A00000000000000000000012 = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = A0000000000000000000001A;
+            buildSettings = { SWIFT_COMPILATION_MODE = wholemodule; };
+            name = Release;
+        };
+        A00000000000000000000013 = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = A0000000000000000000001B;
+            buildSettings = {};
+            name = Debug;
+        };
+        A00000000000000000000014 = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = A0000000000000000000001B;
+            buildSettings = {};
+            name = Release;
+        };
+        A00000000000000000000015 = {
+            isa = XCBuildConfiguration;
+            buildSettings = { DEFINES_MODULE = YES; PRODUCT_NAME = KopyCore; SKIP_INSTALL = YES; };
+            name = Debug;
+        };
+        A00000000000000000000016 = {
+            isa = XCBuildConfiguration;
+            buildSettings = { DEFINES_MODULE = YES; PRODUCT_NAME = KopyCore; SKIP_INSTALL = YES; };
+            name = Release;
+        };
+        A00000000000000000000017 = {
+            isa = PBXTargetDependency;
+            target = A00000000000000000000009;
+            targetProxy = A00000000000000000000019;
+        };
+        A00000000000000000000018 = {
+            isa = PBXBuildFile;
+            fileRef = A00000000000000000000007;
+        };
+        A00000000000000000000019 = {
+            isa = PBXContainerItemProxy;
+            containerPortal = A00000000000000000000001;
+            proxyType = 1;
+            remoteGlobalIDString = A00000000000000000000009;
+            remoteInfo = KopyCore;
+        };
+        A0000000000000000000001A = {
+            isa = PBXFileReference;
+            lastKnownFileType = text.xcconfig;
+            path = Project.xcconfig;
+            sourceTree = "<group>";
+        };
+        A0000000000000000000001B = {
+            isa = PBXFileReference;
+            lastKnownFileType = text.xcconfig;
+            path = Store.xcconfig;
+            sourceTree = "<group>";
+        };
+    };
+    rootObject = A00000000000000000000001;
+}

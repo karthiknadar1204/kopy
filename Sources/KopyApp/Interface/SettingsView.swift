@@ -83,7 +83,13 @@ struct SettingsView: View {
                 }
                 Button("Replay welcome tour", systemImage: "play.circle", action: model.openTour)
             }
+#if KOPY_APP_STORE
+            Section {
+                LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
+            }
+#else
             KopyUpdateSection(updater: model.updater)
+#endif
         }
         .formStyle(.grouped)
     }

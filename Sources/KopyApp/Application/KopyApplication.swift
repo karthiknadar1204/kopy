@@ -28,9 +28,14 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     private var workspaceObservers: [NSObjectProtocol] = []
     private var appObservers: [NSObjectProtocol] = []
     private var suspension = ShelfSuspension()
+#if !KOPY_APP_STORE
     private var holdTestShelf = false
+#endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+#if KOPY_APP_STORE
+        model = KopyModel()
+#else
         let arguments = CommandLine.arguments
         let demo = arguments.contains("--demo")
         let isolated: URL?
@@ -41,12 +46,15 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         holdTestShelf = isolated != nil && arguments.contains("--test-stay-open")
         model = KopyModel(demo: demo, isolatedProfile: isolated)
+#endif
         shelf = EdgeShelfWindow(content: KopyLanguageRoot(model: model) { [model = model!] in ShelfView(model: model) })
         bindModel()
         installStatusItem()
         observeWorkspace()
         model.start()
+#if !KOPY_APP_STORE
         model.updater.start()
+#endif
         shelf.update(model.preferences)
         shelf.start()
         bindShortcut()
@@ -56,12 +64,16 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         RunLoop.main.add(prune, forMode: .common)
         scheduledPrune = prune
 
+#if KOPY_APP_STORE
+        if model.isTourDue, SMAppService.mainApp.status != .enabled { showTour() }
+#else
         if demo || arguments.contains("--show") {
             showShelf()
         } else if model.isTourDue, !arguments.contains("--quiet"), isolated == nil,
                   SMAppService.mainApp.status != .enabled {
             showTour()
         }
+#endif
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -183,9 +195,11 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         menu.addItem(makeItem("Import Clipboard", action: #selector(importClipboard)))
         menu.addItem(makeItem("Settings", action: #selector(showSettings), key: ","))
         menu.addItem(makeItem("Welcome Tour", action: #selector(showTour)))
+#if !KOPY_APP_STORE
         if model.updater.isConfigured {
             menu.addItem(makeItem("Check for updates", action: #selector(checkForUpdates)))
         }
+#endif
         menu.addItem(.separator())
 
         let pause = makeItem("Incognito", action: #selector(toggleIncognito))
@@ -237,13 +251,17 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     @objc private func showShelf() {
         shelf.show(waitForPointerEntry: true)
+#if !KOPY_APP_STORE
         if holdTestShelf { shelf.holdOpen(for: .seconds(60)) }
+#endif
     }
 
+#if !KOPY_APP_STORE
     @objc private func checkForUpdates() {
         showSettings()
         model.updater.checkForUpdates()
     }
+#endif
 
     @objc private func importClipboard() {
         model.importClipboard()
