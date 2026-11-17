@@ -148,7 +148,7 @@ struct ClipPreview: View {
 
     private var actions: some View {
         HStack(spacing: 7) {
-            Button(selected.isEmpty ? "Paste" : "Paste selection", systemImage: "document.on.clipboard") {
+            Button(selected.isEmpty ? ShelfClipboardAction.title : ShelfClipboardAction.selectionTitle, systemImage: ShelfClipboardAction.symbol) {
                 model.paste(item, members: visibleSelection)
             }
             .lineLimit(1)
@@ -156,9 +156,11 @@ struct ClipPreview: View {
             .buttonStyle(ShelfPrimaryButtonStyle())
             .keyboardShortcut(.defaultAction)
 
+#if !KOPY_APP_STORE
             ShelfIconButton(title: selected.isEmpty ? "Copy" : "Copy selection", symbol: "square.on.square") {
                 model.copy(item, members: visibleSelection)
             }
+#endif
 
             if !members.isEmpty {
                 NativeDragGrip(model: model, item: item, members: visibleSelection)

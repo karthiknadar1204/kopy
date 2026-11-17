@@ -1,0 +1,17 @@
+Keep copied text, links, images, and files close at hand with Kopy, a native clipboard shelf for Mac.
+
+Open the shelf from your screen edge, the menu bar, or a keyboard shortcut. Search earlier copies, filter by type, and pin items or add notes to keep them easy to find.
+
+Drop Finder files onto the shelf. Group related files and images into stacks, preview their contents, and drag individual items or a selection back into another app.
+
+Clipboard history is encrypted and stored locally on your Mac. Automatic capture starts paused. Enable it when you want to keep copies, pause it at any time, or use explicit clipboard imports and file drops.
+
+Select an item to copy it, then press Command-V in the destination app to paste it. File references depend on the original file remaining available and authorized by macOS. Saving a web image requests that image from its host.
+
+Adjust shelf placement, appearance, history limits, and cleanup in Settings. Pins and notes protect items from automatic cleanup. Delete protected items individually when you want to remove them.
+
+Privacy policy
+https://github.com/karthiknadar1204/kopy/blob/main/PRIVACY.md
+
+Support
+https://github.com/karthiknadar1204/kopy/blob/main/SUPPORT.md

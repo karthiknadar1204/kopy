@@ -12,7 +12,7 @@ Move your pointer to Kopy's configured screen edge. You can also choose Show She
 
 The Mac App Store build starts with automatic capture paused. Choose Enable clipboard history on the empty shelf or change Pause automatic capture under Settings and Behavior. You can still use Import clipboard and drop files while capture is paused.
 
-If macOS blocks automatic clipboard access, review Kopy's clipboard permission in System Settings. If click-to-paste is unavailable, select a card and press Command-V in the destination app. Settings and System contains Allow automatic paste.
+If macOS blocks automatic clipboard access, review Kopy's clipboard permission in System Settings. In the Mac App Store build, select a card and press Command-V in the destination app. The direct build offers Allow automatic paste under Settings and System. If that permission is unavailable, paste manually with Command-V.
 
 ## Manage saved items
 

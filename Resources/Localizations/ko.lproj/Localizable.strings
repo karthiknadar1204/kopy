@@ -380,3 +380,4 @@
 "Support" = "지원";
 "Enable clipboard history" = "클립보드 기록 활성화";
 "Clipboard history stays on this Mac." = "클립보드 기록은 이 Mac에 저장됩니다.";
+"Copy as plain text" = "일반 텍스트로 복사";

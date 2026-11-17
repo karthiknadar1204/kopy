@@ -128,6 +128,9 @@ final class ClipboardController {
             return .clipboardChanged
         }
 
+#if KOPY_APP_STORE
+        return manualPasteOutcome(written)
+#else
         let selfPID = NSRunningApplication.current.processIdentifier
         guard let target, target.processIdentifier != selfPID,
               !target.isTerminated, CGPreflightPostEventAccess() else {
@@ -167,11 +170,14 @@ final class ClipboardController {
         down.postToPid(target.processIdentifier)
         up.postToPid(target.processIdentifier)
         return .posted
+#endif
     }
 
+#if !KOPY_APP_STORE
     func requestPastePermission() -> Bool {
         CGPreflightPostEventAccess() || CGRequestPostEventAccess()
     }
+#endif
 
     func receiveDrop(
         _ pasteboard: NSPasteboard,

@@ -224,7 +224,7 @@ struct ShelfView: View {
                     .font(.system(size: 11, weight: .medium))
                     .frame(width: 19, height: 19)
                     .background(ShelfTheme.inset, in: .rect(cornerRadius: 5))
-                    .help("Paste into the current app")
+                    .help(Text(ShelfClipboardAction.help))
                     .accessibilityHidden(true)
             }
         }
@@ -433,17 +433,20 @@ struct ShelfView: View {
             ShelfEmptyState(
                 symbol: model.preferences.incognito ? "pause" : "tray",
                 title: model.preferences.incognito ? "Paused" : "Nothing copied yet",
-                detail: model.preferences.incognito ? "Drop to add to Kopy" : "Copy an item or drop a file here."
+                detail: model.preferences.incognito ? "Clipboard history stays on this Mac." : "Copy an item or drop a file here."
             ) {
                 if model.preferences.incognito {
-                    Button("Enable clipboard history", systemImage: "play.circle", action: model.enableClipboardHistory)
-                    Text("Clipboard history stays on this Mac.")
-                        .font(.caption)
-                        .foregroundStyle(ShelfTheme.muted)
-                        .frame(maxWidth: 300)
-                    Link("Privacy Policy", destination: KopyLinks.privacy)
+                    VStack(spacing: 8) {
+                        Button("Enable clipboard history", systemImage: "play.circle", action: model.enableClipboardHistory)
+                        HStack(spacing: 12) {
+                            Button("Import clipboard", systemImage: "document.on.clipboard", action: model.importClipboard)
+                            Link("Privacy Policy", destination: KopyLinks.privacy)
+                                .font(.caption)
+                        }
+                    }
+                } else {
+                    Button("Import clipboard", systemImage: "document.on.clipboard", action: model.importClipboard)
                 }
-                Button("Import clipboard", systemImage: "document.on.clipboard", action: model.importClipboard)
             }
         } else {
             let hasQuery = !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

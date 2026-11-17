@@ -1,0 +1,13 @@
+Kopy is a native macOS menu-bar clipboard shelf. It has no account or login requirement.
+
+Opening the app shows the welcome tour. After the tour, use Show Shelf in Kopy's menu-bar menu. The default shortcut is Control-Option-V. The shelf also opens at the configured screen edge.
+
+Automatic clipboard history starts paused. Choose Enable clipboard history on the empty shelf or change Pause automatic capture under Settings and Behavior. macOS controls clipboard access independently. Manual imports and file drops continue to work while automatic capture is paused.
+
+Use a disposable TextEdit document to copy text, open Kopy, search for it, and select the card. Kopy copies the selection and displays a Command-V instruction. Return to TextEdit and press Command-V to paste. The Mac App Store build does not post keyboard events to another app or request Accessibility access.
+
+Drop a test file from Finder onto the shelf, then reopen Kopy and drag it back out. Kopy stores read-only app-scoped bookmarks for authorized original files. Promised-file attachments are stored with encrypted history. Image exports use Downloads access. The original file must remain available and authorized.
+
+Supported image URL drops fetch the image through an ephemeral network session with cookies and stored credentials disabled. Link labels and previews are derived locally. Clipboard history is not uploaded to a developer server.
+
+Launch at login is off by default and changes only through the user's setting. This store build has no Sparkle updater. Updates use the Mac App Store.

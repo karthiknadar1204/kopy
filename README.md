@@ -41,3 +41,7 @@ Encrypted history is local to the Mac. Kopy stores its encryption key in the log
 | [`.agents/SOURCES.md`](.agents/SOURCES.md) | Pinned project skill sources |
 
 The build script creates an ad hoc signed development bundle by default. See [Build and publish a Kopy update](Scripts/UPDATES.md) for Developer ID signing, notarization, and the Sparkle feed.
+
+## Mac App Store build
+
+[Prepare the sandboxed Mac App Store build](Store/README.md) for the store target, local preview, signing, and submission steps. [Privacy policy](PRIVACY.md). [Support](SUPPORT.md).

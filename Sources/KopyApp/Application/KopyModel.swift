@@ -190,15 +190,21 @@ final class KopyModel {
     }
 
     func refreshPermissions() {
+#if !KOPY_APP_STORE
         hasPastePermission = CGPreflightPostEventAccess()
+#endif
         automaticCaptureDenied = clipboard.automaticCaptureDenied
     }
 
     func requestPastePermission() {
+#if KOPY_APP_STORE
+        inform("Copied. Press ⌘V where you want to paste.")
+#else
         hasPastePermission = clipboard.requestPastePermission()
         if !hasPastePermission {
             inform("Kopy can copy the item for manual paste. Allow Accessibility access in System Settings for click-to-paste.")
         }
+#endif
     }
 
     func setKeyboardEntry(_ enabled: Bool) {

@@ -77,12 +77,18 @@ struct SettingsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 LabeledContent("Paste into other apps") {
+#if KOPY_APP_STORE
+                    Text("Copied. Press ⌘V where you want to paste.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+#else
                     if model.hasPastePermission {
                         Label("Allowed", systemImage: "checkmark.circle")
                             .foregroundStyle(.secondary)
                     } else {
                         Button("Allow automatic paste", action: model.requestPastePermission)
                     }
+#endif
                 }
                 Button("Replay welcome tour", systemImage: "play.circle", action: model.openTour)
                 Link("Privacy Policy", destination: KopyLinks.privacy)

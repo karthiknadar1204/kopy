@@ -32,7 +32,7 @@ Deletion removes an item from Kopy's active history. Kopy does not promise foren
 
 ## Permissions and choices
 
-Automatic clipboard reading follows your macOS clipboard permission. The click-to-paste feature asks for event-posting access through macOS when you select Allow automatic paste. Without that access, Kopy leaves the item ready for you to paste with Command-V.
+Automatic clipboard reading follows your macOS clipboard permission. The direct build offers click-to-paste and asks for event-posting access through macOS when you select Allow automatic paste. Without that access, Kopy leaves the item ready for manual paste. The Mac App Store build copies a selected item to the clipboard. Press Command-V in the destination app to paste it. The store build does not request Accessibility access.
 
 File access comes from files you choose, copy, or drop, and the app can export images to Downloads. Launch at login is optional and can be disabled in Kopy or System Settings.
 

@@ -158,14 +158,14 @@ struct ClipCard: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityHint(item.payload.isStack ? (expanded ? "Collapse stack" : "Open stack") : "Pastes this item")
+        .accessibilityHint(item.payload.isStack ? (expanded ? "Collapse stack" : "Open stack") : ShelfClipboardAction.itemHint)
         .help(activationHelp)
     }
 
     private var activationHelp: Text {
         if item.payload.isStack { return expanded ? Text("Collapse stack") : Text("Open stack") }
         if !item.payload.members.isEmpty { return item.shelfTitle }
-        return Text("Paste into the current app")
+        return Text(ShelfClipboardAction.help)
     }
 
     private var rowLabel: some View {
@@ -271,11 +271,13 @@ struct ClipCard: View {
 
     @ViewBuilder
     private var actions: some View {
-        Button("Paste", systemImage: "document.on.clipboard") { model.paste(item) }
+        Button(ShelfClipboardAction.title, systemImage: ShelfClipboardAction.symbol) { model.paste(item) }
         if case .text(let text) = item.payload, text.html != nil || text.rtf != nil {
-            Button("Paste as plain text", systemImage: "text.alignleft") { model.paste(item, plain: true) }
+            Button(ShelfClipboardAction.plainTitle, systemImage: "text.alignleft") { model.paste(item, plain: true) }
         }
+#if !KOPY_APP_STORE
         Button("Copy", systemImage: "square.on.square") { model.copy(item) }
+#endif
         Button("Preview", systemImage: "arrow.up.left.and.arrow.down.right", action: preview)
         Divider()
         Button(item.pinned ? "Unpin" : "Pin", systemImage: item.pinned ? "pin.slash" : "pin") { model.pin(item) }

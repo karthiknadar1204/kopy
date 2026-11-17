@@ -117,7 +117,7 @@ struct ClipStackMembers: View {
 
     @ViewBuilder
     private func memberActions(_ member: ClipboardMember) -> some View {
-        Button("Paste item", systemImage: "document.on.clipboard") { model.paste(item, members: [member.id]) }
+        Button(ShelfClipboardAction.itemTitle, systemImage: ShelfClipboardAction.symbol) { model.paste(item, members: [member.id]) }
         Button("Copy item", systemImage: "square.on.square") { model.copy(item, members: [member.id]) }
         if case .file(let file) = member {
             Button("Reveal in Finder", systemImage: "folder") { model.reveal(file) }
