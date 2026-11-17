@@ -67,6 +67,9 @@ final class KopyModel {
            let decoded = try? JSONDecoder().decode(ShelfPreferences.self, from: data) {
             preferences = decoded.normalized()
         }
+#if KOPY_APP_STORE
+        if !defaults.bool(forKey: "clipboardCaptureConsented") { preferences.incognito = true }
+#endif
         refreshPermissions()
         refreshLoginState()
     }
@@ -175,6 +178,9 @@ final class KopyModel {
         let retentionChanged = next.historyLimit != preferences.historyLimit || next.autoDeleteHours != preferences.autoDeleteHours
         let captureChanged = next.incognito != preferences.incognito
         preferences = next
+#if KOPY_APP_STORE
+        if !next.incognito { defaults.set(true, forKey: "clipboardCaptureConsented") }
+#endif
         if !isDemo, let data = try? JSONEncoder().encode(next) {
             defaults.set(data, forKey: "shelfPreferences")
         }
@@ -211,6 +217,10 @@ final class KopyModel {
     func finishTour() {
         if !isDemo { defaults.set(Self.tourVersion, forKey: "welcomeTourVersion") }
         tourCompleted?()
+    }
+
+    func enableClipboardHistory() {
+        updatePreferences { $0.incognito = false }
     }
 
     func refreshLoginState() {
@@ -394,8 +404,10 @@ final class KopyModel {
     func reveal(_ file: ClipboardFile) {
         guard !isDemo else { return }
         do {
-            let availableURL = try clipboard.transferURL(for: file)
-            NSWorkspace.shared.activateFileViewerSelecting([availableURL])
+            let transfer = try clipboard.prepareTransfer(for: file)
+            withExtendedLifetime(transfer) {
+                NSWorkspace.shared.activateFileViewerSelecting([transfer.url])
+            }
         } catch {
             inform(error)
         }
@@ -404,7 +416,7 @@ final class KopyModel {
     func copyPaths(_ files: [ClipboardFile]) {
         guard !isDemo else { return }
         do {
-            let paths = try files.map { try clipboard.transferURL(for: $0).path }
+            let paths = try files.map { try clipboard.prepareTransfer(for: $0).url.path }
             copyText(paths.joined(separator: "\n"))
         } catch {
             inform(error)

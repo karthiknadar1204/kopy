@@ -4,6 +4,11 @@ import UniformTypeIdentifiers
 
 @MainActor
 struct TransferFiles {
+    struct PreparedFile {
+        let url: URL
+        var access: ClipboardFileAccess?
+    }
+
     private let manager = FileManager.default
     private let root = FileManager.default.temporaryDirectory.appending(path: "Kopy-Transfers", directoryHint: .isDirectory)
 
@@ -34,7 +39,7 @@ struct TransferFiles {
         return parent.resolvingSymlinksInPath().path == root.resolvingSymlinksInPath().path
     }
 
-    func resolve(_ file: ClipboardFile) throws -> URL {
+    func resolve(_ file: ClipboardFile) throws -> PreparedFile {
         if let attachment = file.attachment {
             let name = file.url.lastPathComponent
             guard !name.isEmpty, name != ".", name != "..", !name.contains("/") else { throw ClipboardTransferError.nameUnavailable }
@@ -42,16 +47,16 @@ struct TransferFiles {
             let url = directory.appending(path: name, directoryHint: .notDirectory)
             do {
                 try attachment.write(to: url, options: .withoutOverwriting)
-                return url
+                return PreparedFile(url: url)
             } catch {
                 try? manager.removeItem(at: directory)
                 throw error
             }
         }
-        guard let original = file.availableURL else {
+        guard let access = file.openFileAccess() else {
             throw ClipboardTransferError.missingFile(file.url.lastPathComponent)
         }
-        return original
+        return PreparedFile(url: access.url, access: access)
     }
 
     func export(_ images: [ClipboardImage], note: String?, capturedAt: Date) throws -> [URL] {

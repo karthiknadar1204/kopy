@@ -64,30 +64,31 @@ struct ClipImageView: View {
         func load(_ source: Source, request: Request) -> CGImage? {
             guard !Task.isCancelled else { return nil }
             let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-            let imageSource: CGImageSource?
-            let cacheKey: NSString?
             switch source {
             case .data(let data):
                 let key = "\(request.identity.uuidString)-\(request.maxPixels)" as NSString
                 if let bitmap = cache.object(forKey: key) { return bitmap }
-                cacheKey = key
-                imageSource = CGImageSourceCreateWithData(data as CFData, sourceOptions)
+                let source = CGImageSourceCreateWithData(data as CFData, sourceOptions)
+                let bitmap = thumbnail(from: source, maxPixels: request.maxPixels)
+                if let bitmap { cache.setObject(bitmap, forKey: key, cost: bitmap.bytesPerRow * bitmap.height) }
+                return bitmap
             case .file(let file):
-                guard let url = file.availableURL else { return nil }
-                cacheKey = nil
-                imageSource = CGImageSourceCreateWithURL(url as CFURL, sourceOptions)
+                guard let access = file.openFileAccess() else { return nil }
+                return withExtendedLifetime(access) {
+                    let source = CGImageSourceCreateWithURL(access.url as CFURL, sourceOptions)
+                    return thumbnail(from: source, maxPixels: request.maxPixels)
+                }
             }
-            guard !Task.isCancelled, let imageSource else { return nil }
-            let bitmap = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, [
+        }
+
+        private func thumbnail(from source: CGImageSource?, maxPixels: Int) -> CGImage? {
+            guard !Task.isCancelled, let source else { return nil }
+            return CGImageSourceCreateThumbnailAtIndex(source, 0, [
                 kCGImageSourceCreateThumbnailFromImageAlways: true,
                 kCGImageSourceCreateThumbnailWithTransform: true,
                 kCGImageSourceShouldCacheImmediately: true,
-                kCGImageSourceThumbnailMaxPixelSize: max(request.maxPixels, 1)
+                kCGImageSourceThumbnailMaxPixelSize: max(maxPixels, 1)
             ] as CFDictionary)
-            if let cacheKey, let bitmap {
-                cache.setObject(bitmap, forKey: cacheKey, cost: bitmap.bytesPerRow * bitmap.height)
-            }
-            return bitmap
         }
     }
 }

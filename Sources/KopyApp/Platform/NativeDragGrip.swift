@@ -15,6 +15,7 @@ struct NativeDragGrip: NSViewRepresentable {
     func updateNSView(_ view: GripView, context: Context) {
         view.items = { model.nativeDragItems(item, members: members) }
         view.completed = { model.finishExternalDrag(item, members: members) }
+        view.ended = model.clipboard.finishDrag
         view.onPress = onPress
         if onPress == nil {
             let label = ShelfLanguage.string("Drag files", language: model.preferences.language)
@@ -26,6 +27,7 @@ struct NativeDragGrip: NSViewRepresentable {
     final class GripView: NSView, NSDraggingSource {
         var items: (() -> [NSDraggingItem])?
         var completed: (() -> Void)?
+        var ended: (() -> Void)?
         var onPress: ((NSEvent.ModifierFlags) -> Void)?
         private var start: CGPoint?
         private var sourceFrame: CGRect?
@@ -97,7 +99,10 @@ struct NativeDragGrip: NSViewRepresentable {
         }
 
         func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
-            defer { sourceFrame = nil }
+            defer {
+                sourceFrame = nil
+                ended?()
+            }
             if operation.contains(.copy), sourceFrame?.contains(screenPoint) != true { completed?() }
         }
     }

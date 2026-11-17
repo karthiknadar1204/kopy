@@ -114,6 +114,15 @@ struct WelcomeView: View {
             Toggle("Launch at login", isOn: Binding(
                 get: { model.launchAtLogin }, set: { model.setLaunchAtLogin($0) }
             ))
+            Toggle("Pause automatic capture", isOn: Binding(
+                get: { model.preferences.incognito },
+                set: { enabled in model.updatePreferences { $0.incognito = enabled } }
+            ))
+            Text("Clipboard history stays on this Mac.")
+                .font(.caption)
+                .foregroundStyle(ShelfTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Link("Privacy Policy", destination: KopyLinks.privacy)
         }
         .toggleStyle(.switch)
         .padding(16)

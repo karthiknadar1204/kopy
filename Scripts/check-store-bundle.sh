@@ -26,4 +26,5 @@ fi
 test -f "$contents/Resources/en.lproj/Localizable.strings"
 test -f "$contents/Resources/Emoji/emoji-16.json"
 test -f "$contents/Resources/Localizations-NOTICE"
+plutil -lint "$contents/Resources/PrivacyInfo.xcprivacy"
 printf 'Checked sandbox signature and resources for %s\n' "$bundle"

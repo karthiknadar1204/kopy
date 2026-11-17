@@ -100,7 +100,7 @@
             name = "Copy Kopy resources";
             runOnlyForDeploymentPostprocessing = 0;
             shellPath = /bin/bash;
-            shellScript = "\"$SRCROOT/../Scripts/stage-app-resources.sh\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
+            shellScript = "\"$SRCROOT/../Scripts/stage-app-resources.sh\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\ninstall -m 644 \"$SRCROOT/PrivacyInfo.xcprivacy\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/PrivacyInfo.xcprivacy\"\n";
         };
         A0000000000000000000000D = {
             isa = PBXSourcesBuildPhase;

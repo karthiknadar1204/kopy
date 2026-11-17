@@ -36,6 +36,8 @@ final class ClipboardController {
     private var pendingGeneration: Int?
     private var pendingAttempts = 0
     private var lastWrite: Int?
+    private var pasteboardAccess: [ClipboardFileAccess] = []
+    private var dragAccess: [ClipboardFileAccess] = []
     private var nextTransferCleanup: ContinuousClock.Instant?
     private let promiseQueue = OperationQueue()
 
@@ -229,16 +231,17 @@ final class ClipboardController {
         _ payload: ClipboardPayload, capturedAt: Date = .now, internalToken: Data? = nil
     ) throws -> [NSDraggingItem] {
         guard !payload.members.isEmpty else { throw ClipboardTransferError.unsupportedPayload }
-        let paths = try payload.members.enumerated().map { index, member in
-            try url(for: member, capturedAt: capturedAt, index: index + 1)
+        let transfers = try payload.members.enumerated().map { index, member in
+            try prepare(member, capturedAt: capturedAt, index: index + 1)
         }
-        return paths.map { url in
-            let item = ClipboardPayloadCodec.item(fileURL: url)
+        dragAccess = transfers.compactMap(\.access)
+        return transfers.map { file in
+            let item = ClipboardPayloadCodec.item(fileURL: file.url)
             item.setData(Data(), forType: Self.localDragType)
             if let internalToken { item.setData(internalToken, forType: ClipboardPayloadCodec.internalDrag) }
             let draggingItem = NSDraggingItem(pasteboardWriter: item)
             draggingItem.setDraggingFrame(NSRect(x: 0, y: 0, width: 36, height: 36),
-                                          contents: NSWorkspace.shared.icon(forFile: url.path))
+                                          contents: NSWorkspace.shared.icon(forFile: file.url.path))
             return draggingItem
         }
     }
@@ -251,12 +254,15 @@ final class ClipboardController {
         return try files.export(images, note: note, capturedAt: capturedAt)
     }
 
-    func transferURL(for file: ClipboardFile) throws -> URL {
+    func finishDrag() { dragAccess.removeAll() }
+
+    func prepareTransfer(for file: ClipboardFile) throws -> TransferFiles.PreparedFile {
         try files.resolve(file)
     }
 
     private func poll() -> ClipboardPayload? {
         let current = generation
+        if current != lastWrite { pasteboardAccess.removeAll() }
         guard !isPaused, current != settledGeneration else {
             pendingGeneration = nil
             return nil
@@ -309,13 +315,15 @@ final class ClipboardController {
         pendingAttempts = 0
     }
 
-    private func write(_ items: [NSPasteboardItem]) throws -> Int {
+    private func write(_ prepared: [PreparedItem]) throws -> Int {
+        let items = prepared.map(\.item)
         guard !items.isEmpty else { throw ClipboardTransferError.unsupportedPayload }
         let written = pasteboard.clearContents()
         markOwnWrite(written)
         guard generation == written else { throw ClipboardTransferError.clipboardChanged }
         guard pasteboard.writeObjects(items) else { throw ClipboardTransferError.clipboardWriteFailed }
         guard generation == written else { throw ClipboardTransferError.clipboardChanged }
+        pasteboardAccess = prepared.compactMap(\.access)
         if pasteboard.name == .general {
             files.recordClipboardItems(items, generation: written)
             pruneTransfersIfDue()
@@ -324,6 +332,7 @@ final class ClipboardController {
     }
 
     private func markOwnWrite(_ written: Int) {
+        pasteboardAccess.removeAll()
         finishCapture(written)
         lastWrite = written
     }
@@ -340,26 +349,35 @@ final class ClipboardController {
         generation == written ? .copiedForManualPaste : .clipboardChanged
     }
 
-    private func items(for payload: ClipboardPayload, plain: Bool, capturedAt: Date) throws -> [NSPasteboardItem] {
-        if case .text(let text) = payload { return [ClipboardPayloadCodec.textItem(text, plain: plain)] }
+    private struct PreparedItem {
+        let item: NSPasteboardItem
+        var access: ClipboardFileAccess?
+    }
+
+    private func items(for payload: ClipboardPayload, plain: Bool, capturedAt: Date) throws -> [PreparedItem] {
+        if case .text(let text) = payload {
+            return [PreparedItem(item: ClipboardPayloadCodec.textItem(text, plain: plain))]
+        }
         if case .image(let image) = payload {
-            return [ClipboardPayloadCodec.item(fileURL: try? files.stage(image, capturedAt: capturedAt), image: image)]
+            let url = try? files.stage(image, capturedAt: capturedAt)
+            return [PreparedItem(item: ClipboardPayloadCodec.item(fileURL: url, image: image))]
         }
         return try payload.members.enumerated().map { index, member in
             switch member {
-            case .file(let file): return ClipboardPayloadCodec.item(fileURL: try files.resolve(file))
+            case .file(let file):
+                let transfer = try files.resolve(file)
+                return PreparedItem(item: ClipboardPayloadCodec.item(fileURL: transfer.url), access: transfer.access)
             case .image(let image):
-                return ClipboardPayloadCodec.item(
-                    fileURL: try files.stage(image, capturedAt: capturedAt, index: index + 1), image: image
-                )
+                let url = try files.stage(image, capturedAt: capturedAt, index: index + 1)
+                return PreparedItem(item: ClipboardPayloadCodec.item(fileURL: url, image: image))
             }
         }
     }
 
-    private func url(for member: ClipboardMember, capturedAt: Date, index: Int) throws -> URL {
+    private func prepare(_ member: ClipboardMember, capturedAt: Date, index: Int) throws -> TransferFiles.PreparedFile {
         switch member {
         case .file(let file): try files.resolve(file)
-        case .image(let image): try files.stage(image, capturedAt: capturedAt, index: index)
+        case .image(let image): TransferFiles.PreparedFile(url: try files.stage(image, capturedAt: capturedAt, index: index))
         }
     }
 

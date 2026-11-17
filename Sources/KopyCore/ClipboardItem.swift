@@ -45,32 +45,53 @@ public struct ClipboardFile: Identifiable, Codable, Equatable, Sendable {
     public let size: Int?
     public let isDirectory: Bool
     public let bookmark: Data?
+    public let bookmarkIsSecurityScoped: Bool?
     public let attachment: Data?
 
     public init(
         id: UUID = UUID(), url: URL, size: Int? = nil, isDirectory: Bool = false,
-        bookmark: Data? = nil, attachment: Data? = nil
+        bookmark: Data? = nil, bookmarkIsSecurityScoped: Bool? = nil, attachment: Data? = nil
     ) {
         self.id = id
         self.url = url
         self.size = size
         self.isDirectory = isDirectory
         self.bookmark = bookmark
+        self.bookmarkIsSecurityScoped = bookmarkIsSecurityScoped
         self.attachment = attachment
     }
 
-    public var availableURL: URL? {
+    public func openFileAccess() -> ClipboardFileAccess? {
         guard attachment == nil else { return nil }
         if let bookmark {
             var stale = false
+            let scoped = bookmarkIsSecurityScoped == true
+            var options: URL.BookmarkResolutionOptions = [.withoutUI, .withoutMounting]
+            if scoped { options.insert(.withSecurityScope) }
             if let resolved = try? URL(
-                resolvingBookmarkData: bookmark, options: [.withoutUI, .withoutMounting], relativeTo: nil,
+                resolvingBookmarkData: bookmark, options: options, relativeTo: nil,
                 bookmarkDataIsStale: &stale
-            ), resolved.isFileURL, FileManager.default.fileExists(atPath: resolved.path) {
-                return resolved
+            ), resolved.isFileURL {
+                let access = ClipboardFileAccess(url: resolved, securityScope: scoped && resolved.startAccessingSecurityScopedResource())
+                if FileManager.default.fileExists(atPath: resolved.path) { return access }
             }
         }
-        return url.isFileURL && FileManager.default.fileExists(atPath: url.path) ? url : nil
+        guard url.isFileURL, FileManager.default.fileExists(atPath: url.path) else { return nil }
+        return ClipboardFileAccess(url: url, securityScope: false)
+    }
+}
+
+public final class ClipboardFileAccess: Sendable {
+    public let url: URL
+    private let securityScope: Bool
+
+    fileprivate init(url: URL, securityScope: Bool) {
+        self.url = url
+        self.securityScope = securityScope
+    }
+
+    deinit {
+        if securityScope { url.stopAccessingSecurityScopedResource() }
     }
 }
 

@@ -435,6 +435,14 @@ struct ShelfView: View {
                 title: model.preferences.incognito ? "Paused" : "Nothing copied yet",
                 detail: model.preferences.incognito ? "Drop to add to Kopy" : "Copy an item or drop a file here."
             ) {
+                if model.preferences.incognito {
+                    Button("Enable clipboard history", systemImage: "play.circle", action: model.enableClipboardHistory)
+                    Text("Clipboard history stays on this Mac.")
+                        .font(.caption)
+                        .foregroundStyle(ShelfTheme.muted)
+                        .frame(maxWidth: 300)
+                    Link("Privacy Policy", destination: KopyLinks.privacy)
+                }
                 Button("Import clipboard", systemImage: "document.on.clipboard", action: model.importClipboard)
             }
         } else {

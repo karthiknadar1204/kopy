@@ -33,6 +33,9 @@ struct SettingsView: View {
             }
             Section("Capture") {
                 Toggle("Pause automatic capture", isOn: setting(\.incognito))
+                Text("Clipboard history stays on this Mac.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 if model.automaticCaptureDenied {
                     Label("macOS has blocked automatic clipboard capture.", systemImage: "info.circle")
                         .font(.caption)
@@ -82,6 +85,8 @@ struct SettingsView: View {
                     }
                 }
                 Button("Replay welcome tour", systemImage: "play.circle", action: model.openTour)
+                Link("Privacy Policy", destination: KopyLinks.privacy)
+                Link("Support", destination: KopyLinks.support)
             }
 #if KOPY_APP_STORE
             Section {

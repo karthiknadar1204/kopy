@@ -16,6 +16,7 @@
     <key>LSMinimumSystemVersion</key><string>$(MACOSX_DEPLOYMENT_TARGET)</string>
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
+    <key>ITSAppUsesNonExemptEncryption</key><false/>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>

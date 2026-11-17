@@ -35,5 +35,6 @@ for entry in 'CFBundleExecutable Kopy' 'CFBundleIdentifier com.karthiknadar.kopy
     plutil -replace "$key" -string "$value" "$contents/Info.plist"
 done
 Scripts/stage-app-resources.sh "$contents/Resources"
+install -m 644 Store/PrivacyInfo.xcprivacy "$contents/Resources/PrivacyInfo.xcprivacy"
 codesign --force --sign - --entitlements Store/Kopy.entitlements "$bundle"
 Scripts/check-store-bundle.sh "$bundle"

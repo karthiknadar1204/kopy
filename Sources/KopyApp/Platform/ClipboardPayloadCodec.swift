@@ -41,6 +41,7 @@ enum ClipboardPayloadCodec {
             )?.compactMap { $0 as? URL } ?? []
             if !urls.isEmpty { return urls.compactMap(fileMember) }
         }
+#if !KOPY_APP_STORE
         if let paths = pasteboard.propertyList(forType: legacyFilenames) as? [String] {
             let members = paths.filter { $0.hasPrefix("/") }.compactMap { path in
                 fileMember(URL(fileURLWithPath: path))
@@ -53,6 +54,7 @@ enum ClipboardPayloadCodec {
            !text.contains(where: \.isNewline), let member = fileMember(url) {
             return [member]
         }
+#endif
         return []
     }
 
@@ -60,9 +62,17 @@ enum ClipboardPayloadCodec {
         guard url.isFileURL, url.host() == nil || url.host()?.isEmpty == true || url.host() == "localhost",
               let resources = try? url.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey]),
               let isDirectory = resources.isDirectory else { return nil }
-        let bookmark = try? url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
+#if KOPY_APP_STORE
+        let bookmarkOptions: URL.BookmarkCreationOptions = [.withSecurityScope, .securityScopeAllowOnlyReadAccess]
+        let scoped = true
+#else
+        let bookmarkOptions: URL.BookmarkCreationOptions = .minimalBookmark
+        let scoped = false
+#endif
+        let bookmark = try? url.bookmarkData(options: bookmarkOptions, includingResourceValuesForKeys: nil, relativeTo: nil)
         return .file(ClipboardFile(
-            url: url.standardizedFileURL, size: resources.fileSize, isDirectory: isDirectory, bookmark: bookmark
+            url: url.standardizedFileURL, size: resources.fileSize, isDirectory: isDirectory, bookmark: bookmark,
+            bookmarkIsSecurityScoped: scoped && bookmark != nil ? true : nil
         ))
     }
 
