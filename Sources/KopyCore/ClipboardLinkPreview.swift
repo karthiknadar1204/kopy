@@ -121,7 +121,10 @@ enum ClipboardLink {
             break
         }
 
-        guard let ascii = url.host()?.lowercased() else { return nil }
+        var authority = URLComponents()
+        authority.scheme = components.scheme
+        authority.host = components.host
+        guard let ascii = authority.url?.host(percentEncoded: false)?.lowercased() else { return nil }
         let withoutWWW = ascii.replacingOccurrences(of: #"^www[0-9]?\."#, with: "", options: .regularExpression)
         let host = withoutWWW.replacingOccurrences(of: #"^m\.(?=[^.]+\.[^.]+)"#, with: "", options: .regularExpression)
         let displayHost = displayDomain(withoutWWW)

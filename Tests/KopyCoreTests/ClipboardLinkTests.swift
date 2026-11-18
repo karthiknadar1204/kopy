@@ -49,4 +49,16 @@ struct ClipboardLinkTests {
         let spoof = try #require(ClipboardText("https://xn--80ak6aa92e.com/").linkPreview?.address)
         #expect(spoof == "xn--80ak6aa92e.com")
     }
+
+    @Test(arguments: [
+        ("https://例子.测试/路径", "例子.测试/路径"),
+        ("https://%E4%BE%8B%E5%AD%90.%E6%B5%8B%E8%AF%95/路径", "例子.测试/路径"),
+        ("https://xn--fsqu00a.xn--0zwm56d/路径", "例子.测试/路径"),
+        ("https://аррӏе.com/", "xn--80ak6aa92e.com"),
+        ("https://%D0%B0%D1%80%D1%80%D3%8F%D0%B5.com/", "xn--80ak6aa92e.com"),
+        ("https://xn--80ak6aa92e.com/", "xn--80ak6aa92e.com")
+    ])
+    func domainDisplayIsConsistentAcrossEncodings(_ input: String, _ address: String) throws {
+        #expect(try #require(ClipboardText(input).linkPreview).address == address)
+    }
 }
