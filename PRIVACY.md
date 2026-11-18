@@ -30,7 +30,7 @@ Kopy creates readable temporary files when another app needs a file or image thr
 
 Deletion removes an item from Kopy's active history. Kopy does not promise forensic erasure from backups, storage snapshots, or storage media. macOS backups may contain local app data. Removing Kopy does not delete files you exported or copied elsewhere.
 
-Kopy keeps the last 20 manual delete or clear actions in memory for Undo during the current app session. Quitting Kopy discards this recovery history. Undo does not use a separate recovery database or upload deleted content.
+Kopy keeps the last 20 manual delete or clear actions for Undo, including after quitting or restarting your Mac. Recovery records are encrypted in the same local database with the same Keychain-protected key as active history. Restoring an action removes its recovery record. Newer actions replace the oldest records after the 20-action limit. Kopy does not upload this content. Damaged encrypted records may be preserved locally for recovery.
 
 ## Permissions and choices
 

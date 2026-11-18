@@ -32,7 +32,7 @@ public actor HistoryStore {
     public nonisolated let unreadableItemCount: Int
     private var generation: Int64
     private var entries: [Entry]
-    private var undoStack: [DeletionRecord] = []
+    private var undoStack: [HistoryDeletion]
 
     public var undoState: HistoryUndoState? {
         undoStack.last.map { HistoryUndoState(id: $0.id, action: $0.action) }
@@ -40,7 +40,7 @@ public actor HistoryStore {
 
     public init(databaseURL: URL, encryptionKey: SymmetricKey) throws {
         let database = try HistoryDatabase(url: databaseURL, key: encryptionKey)
-        let (generation, items, unreadableItemCount) = try database.load()
+        let (generation, items, recovery, unreadableItemCount) = try database.load()
         let identityKey = HKDF<SHA256>.deriveKey(
             inputKeyMaterial: encryptionKey,
             info: Data("kopy-history-identity-v1".utf8),
@@ -50,6 +50,7 @@ public actor HistoryStore {
         self.identityKey = identityKey
         self.unreadableItemCount = unreadableItemCount
         self.generation = generation
+        self.undoStack = recovery
         self.entries = items.map { Entry(item: $0, identity: Self.identity($0.payload, key: identityKey)) }
     }
 
@@ -165,10 +166,11 @@ public actor HistoryStore {
     }
 
     @discardableResult
-    public func undoDeletion() throws -> [ClipboardItem] {
+    public func undoDeletion(preferences: ShelfPreferences = .init(), at: Date = .now) throws -> [ClipboardItem] {
         guard let record = undoStack.last else { return snapshot() }
+        let retentionHours = preferences.normalized().autoDeleteHours
         var next = entries
-        let removed = Dictionary(uniqueKeysWithValues: record.removed.map { ($0.item.id, $0) })
+        let removed = Dictionary(uniqueKeysWithValues: record.removed.map { ($0.id, makeEntry($0)) })
         var anchor: UUID?
         for id in record.order.reversed() {
             guard let deleted = removed[id] else {
@@ -189,27 +191,29 @@ public actor HistoryStore {
                 next[existing] = makeEntry(current)
                 anchor = current.id
             } else {
+                var restored = deleted
+                if !restored.item.isProtected, retentionHours > 0,
+                   restored.item.activityAt < at.addingTimeInterval(-Double(retentionHours) * 3_600) {
+                    restored.item.activityAt = at
+                }
                 let index = anchor.flatMap { following in next.firstIndex { $0.item.id == following } } ?? next.count
-                next.insert(deleted, at: index)
+                next.insert(restored, at: index)
                 anchor = id
             }
         }
-        let restored = try save(next)
-        undoStack.removeLast()
-        return restored
+        return try save(next, recovery: Array(undoStack.dropLast()))
     }
 
     private func saveRemoval(_ next: [Entry], action: HistoryUndoAction, undoable: Bool) throws -> [ClipboardItem] {
         let remaining = Set(next.map { $0.item.id })
         let removed = entries.filter { !remaining.contains($0.item.id) }
         guard !removed.isEmpty else { return snapshot() }
-        let record = DeletionRecord(action: action, removed: removed, order: entries.map { $0.item.id })
-        let result = try save(next)
+        var recovery = undoStack
         if undoable {
-            undoStack.append(record)
-            if undoStack.count > 20 { undoStack.removeFirst() }
+            recovery.append(HistoryDeletion(action: action, removed: removed.map(\.item), order: entries.map { $0.item.id }))
+            if recovery.count > 20 { recovery.removeFirst() }
         }
-        return result
+        return try save(next, recovery: recovery)
     }
 
     @discardableResult
@@ -276,13 +280,6 @@ public actor HistoryStore {
         let identity: Data
     }
 
-    private struct DeletionRecord {
-        let id = UUID()
-        let action: HistoryUndoAction
-        let removed: [Entry]
-        let order: [UUID]
-    }
-
     private func makeEntry(_ item: ClipboardItem) -> Entry {
         Entry(item: item, identity: Self.identity(item.payload, key: identityKey))
     }
@@ -307,11 +304,14 @@ public actor HistoryStore {
         }
     }
 
-    private func save(_ next: [Entry]) throws -> [ClipboardItem] {
+    private func save(_ next: [Entry], recovery: [HistoryDeletion]? = nil) throws -> [ClipboardItem] {
         let items = next.map(\.item)
-        if next != entries {
-            generation = try database.commit(from: entries.map(\.item), to: items, generation: generation)
+        let recovery = recovery ?? undoStack
+        if next != entries || recovery != undoStack {
+            generation = try database.commit(from: entries.map(\.item), to: items,
+                                             previousUndo: undoStack, undo: recovery, generation: generation)
             entries = next
+            undoStack = recovery
         }
         return items
     }

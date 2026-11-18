@@ -133,6 +133,7 @@ final class KopyModel {
                 } catch {
                     self.inform(error)
                 }
+                self.undoState = await store.undoState
                 self.startCapture()
             case .failure(let error):
                 self.hasStoredHistory = false
@@ -450,8 +451,9 @@ final class KopyModel {
     func undoDeletion() {
         guard undoAction != nil, !isUndoingDeletion else { return }
         let currentIDs = Set(items.map(\.id))
+        let settings = preferences
         isUndoingDeletion = true
-        mutate({ try await $0.undoDeletion() }, onFailure: { [weak self] in
+        mutate({ try await $0.undoDeletion(preferences: settings) }, onFailure: { [weak self] in
             self?.isUndoingDeletion = false
         }) { [weak self] updated in
             guard let self else { return }

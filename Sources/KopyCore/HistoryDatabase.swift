@@ -5,6 +5,7 @@ import SQLite3
 final class HistoryDatabase {
     private static let applicationID: Int64 = 0x4B4F5059
     private static let orderContext = Data("kopy-history-v1-order".utf8)
+    private static let undoOrderContext = Data("kopy-history-v2-undo-order".utf8)
     private static let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     private let handle: OpaquePointer
@@ -29,17 +30,27 @@ final class HistoryDatabase {
         sqlite3_close(handle)
     }
 
-    func load() throws -> (generation: Int64, items: [ClipboardItem], unreadableCount: Int) {
+    func load() throws -> (generation: Int64, items: [ClipboardItem], recovery: [HistoryDeletion], unreadableCount: Int) {
         let snapshot = try transaction { try readSnapshot() }
-        guard !snapshot.unreadable.isEmpty else { return (snapshot.generation, snapshot.items, 0) }
+        guard !snapshot.unreadable.isEmpty || snapshot.recovery.needsRepair else {
+            return (snapshot.generation, snapshot.items, snapshot.recovery.records, 0)
+        }
         return try transaction(write: true) {
             // Re-read under the write lock in case another process repaired the same history.
             let current = try readSnapshot()
-            guard !current.unreadable.isEmpty else { return (current.generation, current.items, 0) }
-            try preserveUnreadableRows(current.unreadable, generation: current.generation)
+            guard !current.unreadable.isEmpty || current.recovery.needsRepair else {
+                return (current.generation, current.items, current.recovery.records, 0)
+            }
+            if !current.unreadable.isEmpty {
+                try preserveUnreadableRows(current.unreadable, generation: current.generation)
+            }
+            if current.recovery.needsRepair {
+                try preserveUnreadableRecovery(current.recovery, generation: current.generation)
+            }
             let nextGeneration = current.generation + 1
-            try writeOrder(current.items.map(\.id), generation: nextGeneration)
-            return (nextGeneration, current.items, current.unreadable.count)
+            try writeOrder(current.items.map(\.id), undo: current.recovery.records.map(\.id), generation: nextGeneration)
+            let damaged = current.unreadable.count + current.recovery.damaged.count + (current.recovery.corruptIndex ? 1 : 0)
+            return (nextGeneration, current.items, current.recovery.records, damaged)
         }
     }
 
@@ -47,6 +58,14 @@ final class HistoryDatabase {
         let generation: Int64
         let items: [ClipboardItem]
         let unreadable: [UUID]
+        let recovery: RecoverySnapshot
+    }
+
+    private struct RecoverySnapshot {
+        let records: [HistoryDeletion]
+        let damaged: [UUID]
+        let corruptIndex: Bool
+        var needsRepair: Bool { corruptIndex || !damaged.isEmpty }
     }
 
     private func readSnapshot() throws -> Snapshot {
@@ -72,8 +91,71 @@ final class HistoryDatabase {
         return Snapshot(
             generation: generation,
             items: order.compactMap { itemsByID[$0] },
-            unreadable: order.filter { itemsByID[$0] == nil }
+            unreadable: order.filter { itemsByID[$0] == nil },
+            recovery: try readRecovery()
         )
+    }
+
+    private func readRecovery() throws -> RecoverySnapshot {
+        let encodedOrder: Data? = try statement("SELECT undo_order FROM state WHERE singleton = 1") { query in
+            guard try step(query) else { throw HistoryError.unreadable }
+            return try? blob(query, column: 0)
+        }
+        guard let encodedOrder, let order = try? decode([UUID].self, from: encodedOrder, context: Self.undoOrderContext),
+              order.count <= 20, Set(order).count == order.count else {
+            return RecoverySnapshot(records: [], damaged: [], corruptIndex: true)
+        }
+        let indexed = Set(order)
+        var records: [UUID: HistoryDeletion] = [:]
+        var seen = Set<UUID>()
+        var corruptIndex = false
+        try statement("SELECT id, content FROM undo_records") { query in
+            while try step(query) {
+                guard let rawID = sqlite3_column_text(query, 0), let id = UUID(uuidString: String(cString: rawID)),
+                      id.uuidString == String(cString: rawID), indexed.contains(id), seen.insert(id).inserted else {
+                    corruptIndex = true
+                    continue
+                }
+                if let record = try? decode(HistoryDeletion.self, from: blob(query, column: 1), context: undoContext(id)),
+                   record.id == id, record.isValid {
+                    records[id] = record
+                }
+            }
+        }
+        return RecoverySnapshot(records: corruptIndex ? [] : order.compactMap { records[$0] },
+                                damaged: corruptIndex ? [] : order.filter { records[$0] == nil }, corruptIndex: corruptIndex)
+    }
+
+    private func preserveUnreadableRecovery(_ recovery: RecoverySnapshot, generation: Int64) throws {
+        try execute("""
+            CREATE TABLE IF NOT EXISTS unreadable_undo (id TEXT, content BLOB, generation INTEGER NOT NULL);
+            CREATE TABLE IF NOT EXISTS unreadable_undo_index (content BLOB, generation INTEGER NOT NULL);
+            """)
+        try statement("INSERT INTO unreadable_undo_index SELECT undo_order, ? FROM state WHERE singleton = 1") { query in
+            try check(sqlite3_bind_int64(query, 1, generation))
+            try execute(query)
+        }
+        if recovery.corruptIndex {
+            try statement("INSERT INTO unreadable_undo SELECT id, content, ? FROM undo_records") { query in
+                try check(sqlite3_bind_int64(query, 1, generation))
+                try execute(query)
+            }
+            try execute("DELETE FROM undo_records")
+        } else {
+            try statement("INSERT INTO unreadable_undo SELECT id, content, ? FROM undo_records WHERE id = ?") { query in
+                for id in recovery.damaged {
+                    try check(sqlite3_bind_int64(query, 1, generation))
+                    try bind(id.uuidString, at: 2, to: query)
+                    try execute(query)
+                }
+            }
+            try statement("DELETE FROM undo_records WHERE id = ?") { query in
+                for id in recovery.damaged {
+                    try bind(id.uuidString, at: 1, to: query)
+                    try execute(query)
+                }
+            }
+        }
     }
 
     private func preserveUnreadableRows(_ ids: [UUID], generation: Int64) throws {
@@ -102,12 +184,15 @@ final class HistoryDatabase {
         }
     }
 
-    func commit(from previous: [ClipboardItem], to items: [ClipboardItem], generation: Int64) throws -> Int64 {
+    func commit(from previous: [ClipboardItem], to items: [ClipboardItem],
+                previousUndo: [HistoryDeletion], undo: [HistoryDeletion], generation: Int64) throws -> Int64 {
         let previousByID = Dictionary(uniqueKeysWithValues: previous.map { ($0.id, $0) })
         let nextIDs = Set(items.map(\.id))
         let removed = previous.filter { !nextIDs.contains($0.id) }
         let changed = items.filter { previousByID[$0.id] != $0 }
         let nextGeneration = generation + 1
+        let previousUndoIDs = Set(previousUndo.map(\.id))
+        let undoIDs = Set(undo.map(\.id))
 
         return try transaction(write: true) {
             guard try scalar("SELECT generation FROM state WHERE singleton = 1") == generation else {
@@ -129,7 +214,20 @@ final class HistoryDatabase {
                     try execute(query)
                 }
             }
-            try writeOrder(items.map(\.id), generation: nextGeneration)
+            try statement("DELETE FROM undo_records WHERE id = ?") { query in
+                for id in previousUndoIDs.subtracting(undoIDs) {
+                    try bind(id.uuidString, at: 1, to: query)
+                    try execute(query)
+                }
+            }
+            try statement("INSERT INTO undo_records (id, content) VALUES (?, ?)") { query in
+                for record in undo where !previousUndoIDs.contains(record.id) {
+                    try bind(record.id.uuidString, at: 1, to: query)
+                    try bind(encode(record, context: undoContext(record.id)), at: 2, to: query)
+                    try execute(query)
+                }
+            }
+            try writeOrder(items.map(\.id), undo: undo.map(\.id), generation: nextGeneration)
             return nextGeneration
         }
     }
@@ -137,14 +235,26 @@ final class HistoryDatabase {
     private func initialize() throws {
         let applicationID = try scalar("PRAGMA application_id")
         let version = try scalar("PRAGMA user_version")
-        if applicationID == Self.applicationID && version == 1 { return }
-        guard applicationID == 0, version == 0 else { throw HistoryError.unreadable }
+        if applicationID == Self.applicationID && version == 2 { return }
+        guard applicationID == Self.applicationID && version == 1 || applicationID == 0 && version == 0 else {
+            throw HistoryError.unreadable
+        }
 
         try transaction(write: true) {
             // Another instance may have won initialization while we waited for the write lock.
             let applicationID = try scalar("PRAGMA application_id")
             let version = try scalar("PRAGMA user_version")
-            if applicationID == Self.applicationID && version == 1 { return }
+            if applicationID == Self.applicationID && version == 2 { return }
+            if applicationID == Self.applicationID && version == 1 {
+                let (generation, order) = try readOrder()
+                try execute("""
+                    ALTER TABLE state ADD COLUMN undo_order BLOB;
+                    CREATE TABLE undo_records (id TEXT PRIMARY KEY NOT NULL, content BLOB NOT NULL);
+                    """)
+                try writeOrder(order, undo: [], generation: generation + 1)
+                try execute("PRAGMA user_version = 2")
+                return
+            }
             guard applicationID == 0, version == 0,
                   try scalar("SELECT COUNT(*) FROM sqlite_schema WHERE substr(name, 1, 7) <> 'sqlite_'") == 0 else {
                 throw HistoryError.unreadable
@@ -154,12 +264,14 @@ final class HistoryDatabase {
                 CREATE TABLE state (
                     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
                     generation INTEGER NOT NULL,
-                    item_order BLOB NOT NULL
+                    item_order BLOB NOT NULL,
+                    undo_order BLOB NOT NULL
                 );
+                CREATE TABLE undo_records (id TEXT PRIMARY KEY NOT NULL, content BLOB NOT NULL);
                 PRAGMA application_id = \(Self.applicationID);
-                PRAGMA user_version = 1;
+                PRAGMA user_version = 2;
                 """)
-            try writeOrder([], generation: 0)
+            try writeOrder([], undo: [], generation: 0)
         }
     }
 
@@ -172,20 +284,25 @@ final class HistoryDatabase {
         }
     }
 
-    private func writeOrder(_ ids: [UUID], generation: Int64) throws {
+    private func writeOrder(_ ids: [UUID], undo: [UUID], generation: Int64) throws {
         try statement("""
-            INSERT INTO state (singleton, generation, item_order) VALUES (1, ?, ?)
+            INSERT INTO state (singleton, generation, item_order, undo_order) VALUES (1, ?, ?, ?)
             ON CONFLICT(singleton) DO UPDATE
-                SET generation = excluded.generation, item_order = excluded.item_order
+                SET generation = excluded.generation, item_order = excluded.item_order, undo_order = excluded.undo_order
             """) { query in
             try check(sqlite3_bind_int64(query, 1, generation))
             try bind(encode(ids, context: Self.orderContext), at: 2, to: query)
+            try bind(encode(undo, context: Self.undoOrderContext), at: 3, to: query)
             try execute(query)
         }
     }
 
     private func itemContext(_ id: UUID) -> Data {
         Data("kopy-history-v1-item-\(id.uuidString)".utf8)
+    }
+
+    private func undoContext(_ id: UUID) -> Data {
+        Data("kopy-history-v2-undo-record-\(id.uuidString)".utf8)
     }
 
     private func encode(_ item: some Encodable, context: Data) throws -> Data {

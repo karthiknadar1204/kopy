@@ -6,6 +6,51 @@ import Testing
 
 @MainActor
 struct DeletionUndoTests {
+    @Test("A fresh app model exposes delete and clear Undo after every relaunch")
+    func recoveryAfterRelaunch() async throws {
+        let profile = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let board = NSPasteboard.withUniqueName()
+        var model = KopyModel(isolatedProfile: profile, clipboard: ClipboardController(pasteboard: board))
+        defer {
+            model.stop()
+            board.releaseGlobally()
+            model.defaults.removePersistentDomain(forName: "Kopy.Test.\(profile.lastPathComponent)")
+            try? FileManager.default.removeItem(at: profile)
+        }
+        model.updatePreferences { $0.incognito = true }
+        model.start()
+        model.importPayloads([.text(.init("Relaunch delete fixture")), .text(.init("Relaunch clear fixture"))])
+        try await wait { model.importRevision == 1 }
+        let before = model.items
+        model.delete(before[0])
+        try await wait { model.items.count == 1 && model.undoAction == .delete }
+        model.clear(model.items)
+        try await wait { model.items.isEmpty && model.undoAction == .clear }
+        let clearedAction = model.undoState
+        try #require(board.setString("Current clipboard fixture", forType: .string))
+        let generation = board.changeCount
+
+        model.stop()
+        model = KopyModel(isolatedProfile: profile, clipboard: ClipboardController(pasteboard: board))
+        model.start()
+        try await wait { !model.isLoadingHistory && model.undoAction == .clear }
+        #expect(model.undoState == clearedAction)
+        #expect(model.items.isEmpty)
+        model.undoDeletion()
+        try await wait { model.importRevision == 1 && model.undoAction == .delete }
+        #expect(model.items == [before[1]])
+
+        model.stop()
+        model = KopyModel(isolatedProfile: profile, clipboard: ClipboardController(pasteboard: board))
+        model.start()
+        try await wait { !model.isLoadingHistory && model.undoAction == .delete }
+        model.undoDeletion()
+        try await wait { model.importRevision == 1 && model.undoAction == nil }
+        #expect(model.items == before)
+        #expect(board.changeCount == generation)
+        #expect(board.string(forType: .string) == "Current clipboard fixture")
+    }
+
     @Test("Delete and clear publish recoverable actions and Undo leaves a newer clipboard untouched")
     func modelRecovery() async throws {
         let profile = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)

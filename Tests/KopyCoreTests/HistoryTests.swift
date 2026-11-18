@@ -3,7 +3,7 @@ import CryptoKit
 import Darwin
 import Foundation
 import ImageIO
-import KopyCore
+@testable import KopyCore
 import SQLite3
 import Testing
 import UniformTypeIdentifiers
@@ -406,21 +406,185 @@ extension HistoryTests {
         #expect(await store.undoState == nil)
     }
 
-    @Test("Undo keeps the last twenty actions and never creates a restart recovery journal")
-    func boundedSessionUndo() async throws {
+    @Test("The latest twenty Undo actions survive repeated restarts and are consumed only once")
+    func boundedPersistentUndo() async throws {
         let fixture = try HistoryFixture()
         defer { fixture.remove() }
         let store = try fixture.open()
         let before = try await store.importPayloads((0..<21).map { .text(.init("Undo limit fixture \($0)")) }, preferences: .init())
         for item in before { _ = try await store.delete(item.id, undoable: true) }
-        let reopened = try fixture.open()
-        #expect(await reopened.undoState == nil)
+        var reopened = try fixture.open()
+        #expect(await reopened.undoState == store.undoState)
         #expect(await reopened.snapshot().isEmpty)
-        for _ in 0..<20 { _ = try await store.undoDeletion() }
-        let restored = await store.snapshot()
+        for _ in 0..<20 {
+            _ = try await reopened.undoDeletion()
+            reopened = try fixture.open()
+        }
+        let restored = await reopened.snapshot()
         #expect(Set(restored.map(\.id)) == Set(before.dropFirst().map(\.id)))
-        #expect(await store.undoState == nil)
-        #expect(try await store.undoDeletion() == restored)
+        #expect(await reopened.undoState == nil)
+        #expect(try await reopened.undoDeletion() == restored)
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM undo_records") == 0)
+    }
+
+    @Test("Text, image, and file deletions restore their complete contents after reopening")
+    func persistedPayloadRecovery() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        var store = try fixture.open()
+        let seeded = try await store.importPayloads([
+            .text(.init("Persistent undo text fixture")), .image(try pngFixture(77)), .files([testFile(33)])
+        ], preferences: .init())
+        _ = try await store.setPinned(true, for: seeded[0].id)
+        let before = try await store.setNote("Persistent note fixture", for: seeded[0].id)
+        for item in before {
+            _ = try await store.delete(item.id, undoable: true)
+            let action = await store.undoState
+            store = try fixture.open()
+            #expect(await store.undoState == action)
+            #expect(try await store.undoDeletion() == before)
+            store = try fixture.open()
+            #expect(await store.undoState == nil)
+            #expect(await store.snapshot() == before)
+        }
+    }
+
+    @Test("Restoring an expired item gives it a fresh cleanup interval")
+    func recoverySurvivesAutomaticCleanup() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let now = Date.now
+        let before = try await store.capture(.text(.init("Older recovery fixture")), preferences: .init(), at: now - 172_800)
+        _ = try await store.delete(before[0].id, undoable: true)
+        let reopened = try fixture.open()
+        var settings = ShelfPreferences()
+        settings.autoDeleteHours = 24
+        let restored = try await reopened.undoDeletion(preferences: settings, at: now)
+        #expect(restored.first?.id == before[0].id)
+        #expect(restored.first?.activityAt == now)
+        #expect(try await reopened.prune(preferences: settings, at: now + 60) == restored)
+    }
+
+    @Test("Existing version-one databases migrate without changing saved items")
+    func recoveryMigration() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let oldSession = try fixture.open()
+        let before = try await oldSession.capture(.text(.init("Existing database fixture")), preferences: .init())
+        try fixture.sql("DROP TABLE undo_records; ALTER TABLE state DROP COLUMN undo_order; PRAGMA user_version = 1;")
+        let migrated = try fixture.open()
+        #expect(await migrated.snapshot() == before)
+        #expect(await migrated.undoState == nil)
+        #expect(try fixture.scalar("PRAGMA user_version") == 2)
+        await #expect(throws: HistoryError.changed) {
+            _ = try await oldSession.capture(.text(.init("Outdated session fixture")), preferences: .init())
+        }
+        _ = try await migrated.delete(before[0].id, undoable: true)
+        let reopened = try fixture.open()
+        #expect(try await reopened.undoDeletion() == before)
+    }
+
+    @Test("An interrupted schema upgrade leaves the complete old database available for retry")
+    func recoveryMigrationRollback() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let before = try await fixture.open().capture(.text(.init("Migration rollback fixture")), preferences: .init())
+        try fixture.sql("""
+            DROP TABLE undo_records;
+            ALTER TABLE state DROP COLUMN undo_order;
+            PRAGMA user_version = 1;
+            CREATE TRIGGER interrupt_migration BEFORE UPDATE ON state BEGIN SELECT RAISE(ABORT, 'fixture'); END;
+            """)
+        #expect(throws: HistoryError.unreadable) { _ = try fixture.open() }
+        #expect(try fixture.scalar("PRAGMA user_version") == 1)
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM sqlite_schema WHERE name = 'undo_records'") == 0)
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM items") == 1)
+        try fixture.sql("DROP TRIGGER interrupt_migration")
+        let reopened = try fixture.open()
+        #expect(await reopened.snapshot() == before)
+    }
+
+    @Test("Delete and Undo commit their recovery changes atomically across restarts")
+    func atomicPersistentUndo() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let before = try await store.capture(.text(.init("Atomic recovery fixture")), preferences: .init())
+        try fixture.sql("CREATE TRIGGER interrupt_recovery BEFORE UPDATE ON state BEGIN SELECT RAISE(ABORT, 'fixture'); END;")
+        await #expect(throws: HistoryError.unreadable) { _ = try await store.delete(before[0].id, undoable: true) }
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM undo_records") == 0)
+        let afterFailure = try fixture.open()
+        #expect(await afterFailure.snapshot() == before)
+        #expect(await afterFailure.undoState == nil)
+        try fixture.sql("DROP TRIGGER interrupt_recovery")
+        _ = try await store.delete(before[0].id, undoable: true)
+        let action = await store.undoState
+        try fixture.sql("CREATE TRIGGER interrupt_recovery BEFORE UPDATE ON state BEGIN SELECT RAISE(ABORT, 'fixture'); END;")
+        await #expect(throws: HistoryError.unreadable) { _ = try await store.undoDeletion() }
+        let retry = try fixture.open()
+        #expect(await retry.snapshot().isEmpty)
+        #expect(await retry.undoState == action)
+        try fixture.sql("DROP TRIGGER interrupt_recovery")
+        #expect(try await retry.undoDeletion() == before)
+        let consumed = try fixture.open()
+        #expect(await consumed.undoState == nil)
+        #expect(await consumed.snapshot() == before)
+    }
+
+    @Test("Recovery contents are encrypted and authenticated to their record ID")
+    func authenticatedRecovery() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let text = "Private recovery encryption fixture 👋"
+        let before = try await store.capture(.text(.init(text)), preferences: .init())
+        _ = try await store.delete(before[0].id, undoable: true)
+        let action = try #require(await store.undoState)
+        let sealed = try AES.GCM.SealedBox(combined: fixture.blob("SELECT content FROM undo_records WHERE id = '\(action.id.uuidString)'"))
+        let context = Data("kopy-history-v2-undo-record-\(action.id.uuidString)".utf8)
+        let opened = try AES.GCM.open(sealed, using: fixture.key, authenticating: context)
+        let record = try PropertyListDecoder().decode(HistoryDeletion.self, from: opened)
+        #expect(record.removed == before)
+        #expect(throws: CryptoKitError.self) {
+            _ = try AES.GCM.open(sealed, using: fixture.key, authenticating: Data("different-record".utf8))
+        }
+        #expect(try Data(contentsOf: fixture.url).range(of: Data(text.utf8)) == nil)
+    }
+
+    @Test("A damaged recovery record is preserved while other Undo actions remain usable")
+    func damagedRecoveryRecord() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let before = try await store.importPayloads([.text(.init("Recoverable fixture")), .text(.init("Damaged recovery fixture"))], preferences: .init())
+        _ = try await store.delete(before[0].id, undoable: true)
+        let valid = await store.undoState
+        _ = try await store.delete(before[1].id, undoable: true)
+        let damaged = try #require(await store.undoState)
+        try fixture.sql("UPDATE undo_records SET content = X'AABBCC' WHERE id = '\(damaged.id.uuidString)'")
+        let reopened = try fixture.open()
+        #expect(reopened.unreadableItemCount == 1)
+        #expect(await reopened.undoState == valid)
+        #expect(try await reopened.undoDeletion() == [before[0]])
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM unreadable_undo WHERE content = X'AABBCC'") == 1)
+    }
+
+    @Test("A damaged recovery index does not block readable active history")
+    func damagedRecoveryIndex() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let before = try await store.importPayloads([.text(.init("Deleted fixture")), .text(.init("Readable active fixture"))], preferences: .init())
+        let active = try await store.delete(before[0].id, undoable: true)
+        try fixture.sql("UPDATE state SET undo_order = X'AABBCC'")
+        let reopened = try fixture.open()
+        #expect(reopened.unreadableItemCount == 1)
+        #expect(await reopened.snapshot() == active)
+        #expect(await reopened.undoState == nil)
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM unreadable_undo") == 1)
+        #expect(try fixture.scalar("SELECT COUNT(*) FROM unreadable_undo_index WHERE content = X'AABBCC'") == 1)
+        _ = try await reopened.capture(.text(.init("Copy after recovery repair")), preferences: .init())
     }
 }
 
@@ -456,6 +620,18 @@ private struct HistoryFixture {
             defer { sqlite3_finalize(query) }
             try #require(sqlite3_step(query) == SQLITE_ROW)
             return sqlite3_column_int64(query, 0)
+        }
+    }
+
+    func blob(_ statement: String) throws -> Data {
+        try withConnection { connection in
+            var query: OpaquePointer?
+            try #require(sqlite3_prepare_v2(connection, statement, -1, &query, nil) == SQLITE_OK)
+            defer { sqlite3_finalize(query) }
+            try #require(sqlite3_step(query) == SQLITE_ROW)
+            let count = sqlite3_column_bytes(query, 0)
+            let bytes = try #require(sqlite3_column_blob(query, 0))
+            return Data(bytes: bytes, count: Int(count))
         }
     }
 
