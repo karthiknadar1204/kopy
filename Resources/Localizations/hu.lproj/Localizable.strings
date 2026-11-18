@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Vágólapelőzmények engedélyezése";
 "Clipboard history stays on this Mac." = "A vágólapelőzmények ezen a Macen maradnak.";
 "Copy as plain text" = "Másolás egyszerű szövegként";
+
+"File" = "Fájl";
+"Edit" = "Szerkesztés";
+"Undo" = "Visszavonás";
+"Redo" = "Újra";
+"Cut" = "Kivágás";

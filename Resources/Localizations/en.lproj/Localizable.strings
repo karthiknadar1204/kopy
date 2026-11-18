@@ -385,3 +385,9 @@
 "Enable clipboard history" = "Enable clipboard history";
 "Clipboard history stays on this Mac." = "Clipboard history stays on this Mac.";
 "Copy as plain text" = "Copy as plain text";
+
+"File" = "File";
+"Edit" = "Edit";
+"Undo" = "Undo";
+"Redo" = "Redo";
+"Cut" = "Cut";

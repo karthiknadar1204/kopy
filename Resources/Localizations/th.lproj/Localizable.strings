@@ -381,3 +381,9 @@
 "Enable clipboard history" = "เปิดใช้ประวัติคลิปบอร์ด";
 "Clipboard history stays on this Mac." = "ประวัติคลิปบอร์ดจะเก็บไว้ใน Mac เครื่องนี้";
 "Copy as plain text" = "คัดลอกเป็นข้อความธรรมดา";
+
+"File" = "ไฟล์";
+"Edit" = "แก้ไข";
+"Undo" = "เลิกทำ";
+"Redo" = "ทำซ้ำ";
+"Cut" = "ตัด";

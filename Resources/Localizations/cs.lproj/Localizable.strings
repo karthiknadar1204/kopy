@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Zapnout historii schránky";
 "Clipboard history stays on this Mac." = "Historie schránky zůstává na tomto Macu.";
 "Copy as plain text" = "Kopírovat jako prostý text";
+
+"File" = "Soubor";
+"Edit" = "Úpravy";
+"Undo" = "Zpět";
+"Redo" = "Znovu";
+"Cut" = "Vyjmout";

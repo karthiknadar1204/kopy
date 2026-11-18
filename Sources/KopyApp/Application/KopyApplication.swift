@@ -49,6 +49,7 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
 #endif
         shelf = EdgeShelfWindow(content: KopyLanguageRoot(model: model) { [model = model!] in ShelfView(model: model) })
         bindModel()
+        installApplicationMenu()
         installStatusItem()
         observeWorkspace()
         model.start()
@@ -108,6 +109,7 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
             shelf.update(next)
             settingsWindow?.title = localized("Kopy Settings")
             tourWindow?.title = localized("Welcome to Kopy")
+            installApplicationMenu()
             if next.shortcut != attemptedShortcut { bindShortcut() }
         }
         model.keyboardEntryChanged = { [weak self] enabled in self?.shelf.setKeyboardEntry(enabled) }
@@ -177,6 +179,40 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
                 self?.model.suspend(false)
             }
         }
+    }
+
+    private func installApplicationMenu() {
+        let menu = NSMenu()
+        let application = NSMenu(title: "Kopy")
+        application.addItem(makeItem("Settings", action: #selector(showSettings), key: ","))
+        application.addItem(.separator())
+        application.addItem(makeItem("Quit Kopy", action: #selector(quit), key: "q"))
+        let applicationItem = NSMenuItem()
+        applicationItem.submenu = application
+        menu.addItem(applicationItem)
+
+        let file = NSMenu(title: localized("File"))
+        file.addItem(NSMenuItem(title: localized("Close"), action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
+        let fileItem = NSMenuItem(title: file.title, action: nil, keyEquivalent: "")
+        fileItem.submenu = file
+        menu.addItem(fileItem)
+
+        let edit = NSMenu(title: localized("Edit"))
+        for (title, action, key) in [
+            ("Undo", Selector(("undo:")), "z"),
+            ("Redo", Selector(("redo:")), "Z"),
+            ("Cut", #selector(NSText.cut(_:)), "x"),
+            ("Copy", #selector(NSText.copy(_:)), "c"),
+            ("Paste", #selector(NSText.paste(_:)), "v"),
+            ("Select all", #selector(NSText.selectAll(_:)), "a")
+        ] {
+            if key == "x" || key == "a" { edit.addItem(.separator()) }
+            edit.addItem(NSMenuItem(title: localized(title), action: action, keyEquivalent: key))
+        }
+        let editItem = NSMenuItem(title: edit.title, action: nil, keyEquivalent: "")
+        editItem.submenu = edit
+        menu.addItem(editItem)
+        NSApp.mainMenu = menu
     }
 
     private func installStatusItem() {

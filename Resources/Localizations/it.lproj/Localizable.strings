@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Attiva la cronologia degli appunti";
 "Clipboard history stays on this Mac." = "La cronologia degli appunti rimane su questo Mac.";
 "Copy as plain text" = "Copia come testo semplice";
+
+"File" = "File";
+"Edit" = "Modifica";
+"Undo" = "Annulla";
+"Redo" = "Ripristina";
+"Cut" = "Taglia";

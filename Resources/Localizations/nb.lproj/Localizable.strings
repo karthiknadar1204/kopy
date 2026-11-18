@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Aktiver utklippstavlehistorikk";
 "Clipboard history stays on this Mac." = "Utklippstavlehistorikken blir på denne Macen.";
 "Copy as plain text" = "Kopier som ren tekst";
+
+"File" = "Arkiv";
+"Edit" = "Rediger";
+"Undo" = "Angre";
+"Redo" = "Utfør likevel";
+"Cut" = "Klipp ut";

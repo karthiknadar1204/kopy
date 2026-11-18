@@ -381,3 +381,9 @@
 "Enable clipboard history" = "クリップボード履歴を有効にする";
 "Clipboard history stays on this Mac." = "クリップボードの履歴はこのMacに保存されます。";
 "Copy as plain text" = "標準テキストとしてコピー";
+
+"File" = "ファイル";
+"Edit" = "編集";
+"Undo" = "取り消す";
+"Redo" = "やり直す";
+"Cut" = "カット";

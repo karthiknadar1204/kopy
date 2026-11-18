@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Включить историю буфера обмена";
 "Clipboard history stays on this Mac." = "История буфера обмена хранится на этом Mac.";
 "Copy as plain text" = "Копировать как обычный текст";
+
+"File" = "Файл";
+"Edit" = "Правка";
+"Undo" = "Отменить";
+"Redo" = "Повторить";
+"Cut" = "Вырезать";

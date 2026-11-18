@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Activar historial del portapapeles";
 "Clipboard history stays on this Mac." = "El historial del portapapeles permanece en este Mac.";
 "Copy as plain text" = "Copiar como texto sin formato";
+
+"File" = "Archivo";
+"Edit" = "Edición";
+"Undo" = "Deshacer";
+"Redo" = "Rehacer";
+"Cut" = "Cortar";

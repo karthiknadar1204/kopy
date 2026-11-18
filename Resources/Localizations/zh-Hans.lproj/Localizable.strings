@@ -381,3 +381,9 @@
 "Enable clipboard history" = "启用剪贴板历史记录";
 "Clipboard history stays on this Mac." = "剪贴板历史记录保存在此 Mac 上。";
 "Copy as plain text" = "复制为纯文本";
+
+"File" = "文件";
+"Edit" = "编辑";
+"Undo" = "撤销";
+"Redo" = "重做";
+"Cut" = "剪切";

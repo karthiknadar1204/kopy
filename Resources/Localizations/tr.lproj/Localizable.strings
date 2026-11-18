@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Pano geçmişini etkinleştir";
 "Clipboard history stays on this Mac." = "Pano geçmişi bu Mac’te kalır.";
 "Copy as plain text" = "Düz metin olarak kopyala";
+
+"File" = "Dosya";
+"Edit" = "Düzen";
+"Undo" = "Geri Al";
+"Redo" = "Yinele";
+"Cut" = "Kes";

@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Ενεργοποίηση ιστορικού προχείρου";
 "Clipboard history stays on this Mac." = "Το ιστορικό προχείρου παραμένει σε αυτό το Mac.";
 "Copy as plain text" = "Αντιγραφή ως απλό κείμενο";
+
+"File" = "Αρχείο";
+"Edit" = "Επεξεργασία";
+"Undo" = "Αναίρεση";
+"Redo" = "Επανάληψη";
+"Cut" = "Αποκοπή";

@@ -381,3 +381,9 @@
 "Enable clipboard history" = "क्लिपबोर्ड इतिहास चालू करें";
 "Clipboard history stays on this Mac." = "क्लिपबोर्ड इतिहास इस Mac पर रहता है।";
 "Copy as plain text" = "सादा पाठ के रूप में कॉपी करें";
+
+"File" = "फ़ाइल";
+"Edit" = "संपादन";
+"Undo" = "पूर्ववत करें";
+"Redo" = "फिर से करें";
+"Cut" = "काटें";

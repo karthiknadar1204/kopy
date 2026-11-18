@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Activează istoricul clipboardului";
 "Clipboard history stays on this Mac." = "Istoricul clipboardului rămâne pe acest Mac.";
 "Copy as plain text" = "Copiază ca text simplu";
+
+"File" = "Fișier";
+"Edit" = "Editare";
+"Undo" = "Anulează";
+"Redo" = "Refă";
+"Cut" = "Taie";

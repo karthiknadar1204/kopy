@@ -381,3 +381,9 @@
 "Enable clipboard history" = "Włącz historię schowka";
 "Clipboard history stays on this Mac." = "Historia schowka pozostaje na tym Macu.";
 "Copy as plain text" = "Kopiuj jako zwykły tekst";
+
+"File" = "Plik";
+"Edit" = "Edycja";
+"Undo" = "Cofnij";
+"Redo" = "Ponów";
+"Cut" = "Wytnij";
