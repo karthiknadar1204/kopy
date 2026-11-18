@@ -410,3 +410,7 @@
 "Item deleted" = "Item deleted";
 "History cleared" = "History cleared";
 "A newer copy has a different note. Undo is still available." = "A newer copy has a different note. Undo is still available.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Click an item to copy it, then press ⌘V in the destination app.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app.";

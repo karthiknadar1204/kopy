@@ -406,3 +406,7 @@
 "Item deleted" = "項目を削除しました";
 "History cleared" = "履歴を消去しました";
 "A newer copy has a different note. Undo is still available." = "新しいコピーには別のメモがあります。取り消しは引き続き利用できます。";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "項目をクリックしてコピーし、貼り付け先のアプリで⌘Vを押します。";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "項目のメニューからプレビューを開きます。選択した項目をコピーし、貼り付け先のアプリで⌘Vを押します。";

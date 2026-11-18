@@ -406,3 +406,7 @@
 "Item deleted" = "Elem törölve";
 "History cleared" = "Előzmények törölve";
 "A newer copy has a different note. Undo is still available." = "Egy újabb másolathoz más jegyzet tartozik. A visszavonás továbbra is elérhető.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Kattintson egy elemre a másolásához, majd nyomja meg a ⌘V billentyűkombinációt a célalkalmazásban.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Nyisson előnézetet az elem menüjéből. Másolja a kijelölést, majd nyomja meg a ⌘V billentyűkombinációt a célalkalmazásban.";

@@ -406,3 +406,7 @@
 "Item deleted" = "Item excluído";
 "History cleared" = "Histórico limpo";
 "A newer copy has a different note. Undo is still available." = "Uma cópia mais recente tem uma nota diferente. Desfazer continua disponível.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Clique num item para o copiar e depois prima ⌘V na aplicação de destino.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Abra uma pré-visualização no menu do item. Copie a seleção e depois prima ⌘V na aplicação de destino.";

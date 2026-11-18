@@ -406,3 +406,7 @@
 "Item deleted" = "আইটেম মুছে ফেলা হয়েছে";
 "History cleared" = "ইতিহাস মুছে ফেলা হয়েছে";
 "A newer copy has a different note. Undo is still available." = "নতুন কপিতে আলাদা নোট আছে। এখনও পূর্বাবস্থায় ফেরানো যাবে।";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "কোনো আইটেম কপি করতে সেটিতে ক্লিক করুন, তারপর গন্তব্য অ্যাপে ⌘V চাপুন।";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "প্রিভিউ খুলতে আইটেমের মেনু ব্যবহার করুন। নির্বাচিত আইটেম কপি করুন, তারপর গন্তব্য অ্যাপে ⌘V চাপুন।";

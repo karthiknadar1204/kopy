@@ -406,3 +406,7 @@
 "Item deleted" = "הפריט נמחק";
 "History cleared" = "ההיסטוריה נוקתה";
 "A newer copy has a different note. Undo is still available." = "לעותק חדש יותר יש הערה שונה. עדיין ניתן לבטל.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "לחצו על פריט כדי להעתיק אותו, ואז לחצו על ⌘V באפליקציית היעד.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "פתחו תצוגה מקדימה מתפריט הפריט. העתיקו את הבחירה, ואז לחצו על ⌘V באפליקציית היעד.";

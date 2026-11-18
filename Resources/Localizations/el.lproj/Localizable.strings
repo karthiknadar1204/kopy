@@ -406,3 +406,7 @@
 "Item deleted" = "Το στοιχείο διαγράφηκε";
 "History cleared" = "Το ιστορικό εκκαθαρίστηκε";
 "A newer copy has a different note. Undo is still available." = "Ένα νεότερο αντίγραφο έχει διαφορετική σημείωση. Η αναίρεση παραμένει διαθέσιμη.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Κάντε κλικ σε ένα στοιχείο για αντιγραφή και μετά πατήστε ⌘V στην εφαρμογή προορισμού.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Ανοίξτε μια προεπισκόπηση από το μενού του στοιχείου. Αντιγράψτε την επιλογή σας και μετά πατήστε ⌘V στην εφαρμογή προορισμού.";

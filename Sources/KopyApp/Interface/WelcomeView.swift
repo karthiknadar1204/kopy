@@ -273,7 +273,12 @@ private enum TourStep: Int, CaseIterable {
         case .dropIn: "Drop files onto the shelf"
         case .dragOut: "Drag files back out"
         case .stacks: "Keep related items together"
-        case .preview: "Inspect before pasting"
+        case .preview:
+#if KOPY_APP_STORE
+            "Preview"
+#else
+            "Inspect before pasting"
+#endif
         case .find: "Find an earlier copy"
         case .settings: "Place your shelf"
         }
@@ -282,11 +287,21 @@ private enum TourStep: Int, CaseIterable {
     var instruction: LocalizedStringKey {
         switch self {
         case .welcome: "Move the pointer to a screen edge to open your clipboard shelf."
-        case .collect: "Copied text, links, images, and files appear in Recent. Click an item to paste it."
+        case .collect:
+#if KOPY_APP_STORE
+            "Click an item to copy it, then press ⌘V in the destination app."
+#else
+            "Copied text, links, images, and files appear in Recent. Click an item to paste it."
+#endif
         case .dropIn: "Drag a file from Finder to the edge. The shelf opens when it detects the drop."
         case .dragOut: "Drag a file or image from Kopy to Finder or another app."
         case .stacks: "Drop a file or image card onto another to make a stack. Open the stack to work with individual items."
-        case .preview: "Use an item's menu to open a preview. Select the members you want to paste or copy."
+        case .preview:
+#if KOPY_APP_STORE
+            "Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app."
+#else
+            "Use an item's menu to open a preview. Select the members you want to paste or copy."
+#endif
         case .find: "Search copied text, filenames, and notes. Pin items to keep them through history cleanup."
         case .settings: "Choose an edge, then adjust your preferences whenever you like."
         }

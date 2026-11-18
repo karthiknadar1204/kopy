@@ -406,3 +406,7 @@
 "Item deleted" = "Objekt raderat";
 "History cleared" = "Historik rensad";
 "A newer copy has a different note. Undo is still available." = "En nyare kopia har en annan anteckning. Du kan fortfarande ångra.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Klicka på ett objekt för att kopiera det och tryck sedan på ⌘V i målappen.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Öppna en förhandsvisning från objektets meny. Kopiera ditt urval och tryck sedan på ⌘V i målappen.";

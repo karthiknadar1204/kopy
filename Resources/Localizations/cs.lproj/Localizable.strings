@@ -406,3 +406,7 @@
 "Item deleted" = "Položka smazána";
 "History cleared" = "Historie vymazána";
 "A newer copy has a different note. Undo is still available." = "Novější kopie má jinou poznámku. Zpět je stále k dispozici.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Kliknutím na položku ji zkopírujete. Poté v cílové aplikaci stiskněte ⌘V.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Otevřete náhled z nabídky položky. Zkopírujte výběr a v cílové aplikaci stiskněte ⌘V.";

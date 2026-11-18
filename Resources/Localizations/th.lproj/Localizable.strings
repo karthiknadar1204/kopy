@@ -406,3 +406,7 @@
 "Item deleted" = "ลบรายการแล้ว";
 "History cleared" = "ล้างประวัติแล้ว";
 "A newer copy has a different note. Undo is still available." = "สำเนาที่ใหม่กว่ามีโน้ตต่างกัน ยังสามารถเลิกทำได้";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "คลิกรายการเพื่อคัดลอก จากนั้นกด ⌘V ในแอปปลายทาง";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "เปิดตัวอย่างจากเมนูของรายการ คัดลอกสิ่งที่เลือก จากนั้นกด ⌘V ในแอปปลายทาง";

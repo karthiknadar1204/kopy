@@ -406,3 +406,7 @@
 "Item deleted" = "Onderdeel verwijderd";
 "History cleared" = "Geschiedenis gewist";
 "A newer copy has a different note. Undo is still available." = "Een nieuwere kopie heeft een andere notitie. Ongedaan maken blijft beschikbaar.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Klik op een onderdeel om het te kopiëren en druk daarna op ⌘V in de doelapp.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Open een voorvertoning via het menu van het onderdeel. Kopieer je selectie en druk daarna op ⌘V in de doelapp.";

@@ -406,3 +406,7 @@
 "Item deleted" = "Élément supprimé";
 "History cleared" = "Historique effacé";
 "A newer copy has a different note. Undo is still available." = "Une copie plus récente a une note différente. L’annulation reste disponible.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Cliquez sur un élément pour le copier, puis appuyez sur ⌘V dans l’application de destination.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Ouvrez un aperçu depuis le menu de l’élément. Copiez la sélection, puis appuyez sur ⌘V dans l’application de destination.";

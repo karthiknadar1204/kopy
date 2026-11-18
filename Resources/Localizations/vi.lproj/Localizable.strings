@@ -406,3 +406,7 @@
 "Item deleted" = "Đã xóa mục";
 "History cleared" = "Đã xóa lịch sử";
 "A newer copy has a different note. Undo is still available." = "Bản sao mới hơn có ghi chú khác. Bạn vẫn có thể hoàn tác.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Nhấp vào một mục để sao chép, rồi nhấn ⌘V trong ứng dụng đích.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Mở bản xem trước từ menu của mục. Sao chép phần đã chọn, rồi nhấn ⌘V trong ứng dụng đích.";

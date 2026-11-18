@@ -406,3 +406,7 @@
 "Item deleted" = "Element șters";
 "History cleared" = "Istoric șters";
 "A newer copy has a different note. Undo is still available." = "O copie mai nouă are o notă diferită. Anularea este încă disponibilă.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Faceți clic pe un element pentru a-l copia, apoi apăsați ⌘V în aplicația de destinație.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Deschideți o previzualizare din meniul elementului. Copiați selecția, apoi apăsați ⌘V în aplicația de destinație.";

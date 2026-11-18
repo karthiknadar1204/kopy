@@ -406,3 +406,7 @@
 "Item deleted" = "Елемент видалено";
 "History cleared" = "Історію очищено";
 "A newer copy has a different note. Undo is still available." = "Новіша копія має іншу нотатку. Скасування залишається доступним.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Натисніть на елемент, щоб скопіювати його, а потім натисніть ⌘V у цільовій програмі.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Відкрийте попередній перегляд через меню елемента. Скопіюйте вибране, а потім натисніть ⌘V у цільовій програмі.";

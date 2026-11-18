@@ -406,3 +406,7 @@
 "Item deleted" = "Objekt slettet";
 "History cleared" = "Historikk tømt";
 "A newer copy has a different note. Undo is still available." = "En nyere kopi har en annen merknad. Du kan fortsatt angre.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Klikk på et element for å kopiere det, og trykk deretter på ⌘V i målappen.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Åpne en forhåndsvisning fra elementets meny. Kopier utvalget, og trykk deretter på ⌘V i målappen.";

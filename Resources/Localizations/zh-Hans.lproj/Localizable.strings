@@ -406,3 +406,7 @@
 "Item deleted" = "项目已删除";
 "History cleared" = "历史记录已清除";
 "A newer copy has a different note. Undo is still available." = "较新的副本有不同的备注。仍可撤销。";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "点击项目进行复制，然后在目标应用中按 ⌘V。";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "从项目菜单打开预览。复制所选项目，然后在目标应用中按 ⌘V。";

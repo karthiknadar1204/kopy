@@ -406,3 +406,7 @@
 "Item deleted" = "Kohde poistettu";
 "History cleared" = "Historia tyhjennetty";
 "A newer copy has a different note. Undo is still available." = "Uudemmassa kopiossa on eri muistiinpano. Kumoaminen on yhä käytettävissä.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Kopioi kohde napsauttamalla sitä ja paina sitten kohdesovelluksessa ⌘V.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Avaa esikatselu kohteen valikosta. Kopioi valinta ja paina sitten kohdesovelluksessa ⌘V.";

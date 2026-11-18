@@ -406,3 +406,7 @@
 "Item deleted" = "Item dihapus";
 "History cleared" = "Riwayat dihapus";
 "A newer copy has a different note. Undo is still available." = "Salinan yang lebih baru memiliki catatan berbeda. Urungkan masih tersedia.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Klik item untuk menyalinnya, lalu tekan ⌘V di aplikasi tujuan.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Buka pratinjau dari menu item. Salin pilihan Anda, lalu tekan ⌘V di aplikasi tujuan.";

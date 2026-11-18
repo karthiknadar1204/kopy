@@ -406,3 +406,7 @@
 "Item deleted" = "Öğe silindi";
 "History cleared" = "Geçmiş temizlendi";
 "A newer copy has a different note. Undo is still available." = "Daha yeni bir kopyada farklı bir not var. Geri alma hâlâ kullanılabilir.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Bir öğeyi kopyalamak için tıklayın, ardından hedef uygulamada ⌘V tuşlarına basın.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Öğenin menüsünden önizlemeyi açın. Seçiminizi kopyalayın, ardından hedef uygulamada ⌘V tuşlarına basın.";

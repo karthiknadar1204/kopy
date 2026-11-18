@@ -406,3 +406,7 @@
 "Item deleted" = "항목이 삭제됨";
 "History cleared" = "기록이 지워짐";
 "A newer copy has a different note. Undo is still available." = "최신 복사본에 다른 메모가 있습니다. 실행 취소는 계속 사용할 수 있습니다.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "항목을 클릭하여 복사한 다음 대상 앱에서 ⌘V를 누르세요.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "항목 메뉴에서 미리보기를 여세요. 선택한 항목을 복사한 다음 대상 앱에서 ⌘V를 누르세요.";

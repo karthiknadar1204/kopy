@@ -406,3 +406,7 @@
 "Item deleted" = "تم حذف العنصر";
 "History cleared" = "تم مسح السجل";
 "A newer copy has a different note. Undo is still available." = "تحتوي نسخة أحدث على ملاحظة مختلفة. لا يزال التراجع متاحًا.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "انقر على عنصر لنسخه، ثم اضغط على ⌘V في التطبيق الوجهة.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "افتح معاينة من قائمة العنصر. انسخ التحديد، ثم اضغط على ⌘V في التطبيق الوجهة.";

@@ -216,6 +216,9 @@ final class KopyModel {
         hasPastePermission = clipboard.requestPastePermission()
         if !hasPastePermission {
             inform("Kopy can copy the item for manual paste. Allow Accessibility access in System Settings for click-to-paste.")
+            if let settings = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                NSWorkspace.shared.open(settings)
+            }
         }
 #endif
     }

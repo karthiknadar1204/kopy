@@ -406,3 +406,7 @@
 "Item deleted" = "مورد حذف شد";
 "History cleared" = "سابقه پاک شد";
 "A newer copy has a different note. Undo is still available." = "نسخهٔ جدیدتر یادداشت متفاوتی دارد. واگرد همچنان در دسترس است.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "برای کپی کردن یک مورد روی آن کلیک کنید، سپس در برنامهٔ مقصد ⌘V را فشار دهید.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "از منوی مورد، پیش‌نمایش را باز کنید. انتخاب خود را کپی کنید، سپس در برنامهٔ مقصد ⌘V را فشار دهید.";

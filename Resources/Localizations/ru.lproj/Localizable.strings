@@ -406,3 +406,7 @@
 "Item deleted" = "Объект удалён";
 "History cleared" = "История очищена";
 "A newer copy has a different note. Undo is still available." = "У более новой копии другая заметка. Отмена по-прежнему доступна.";
+
+"Click an item to copy it, then press ⌘V in the destination app." = "Нажмите на элемент, чтобы скопировать его, затем нажмите ⌘V в приложении назначения.";
+
+"Use an item's menu to open a preview. Copy your selection, then press ⌘V in the destination app." = "Откройте предпросмотр через меню элемента. Скопируйте выбранные элементы, затем нажмите ⌘V в приложении назначения.";
