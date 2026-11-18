@@ -387,3 +387,4 @@
 "Undo" = "Herstel";
 "Redo" = "Opnieuw";
 "Cut" = "Knip";
+"Copy an item, then press ⌘V here." = "Kopieer een onderdeel en druk hier op ⌘V.";

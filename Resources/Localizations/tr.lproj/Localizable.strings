@@ -387,3 +387,4 @@
 "Undo" = "Geri Al";
 "Redo" = "Yinele";
 "Cut" = "Kes";
+"Copy an item, then press ⌘V here." = "Bir öğeyi kopyalayın, ardından burada ⌘V tuşlarına basın.";

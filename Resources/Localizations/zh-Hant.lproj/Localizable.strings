@@ -387,3 +387,4 @@
 "Undo" = "還原";
 "Redo" = "重做";
 "Cut" = "剪下";
+"Copy an item, then press ⌘V here." = "拷貝一個項目，然後在此處按 ⌘V。";

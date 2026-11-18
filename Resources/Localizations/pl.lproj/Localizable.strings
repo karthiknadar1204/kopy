@@ -387,3 +387,4 @@
 "Undo" = "Cofnij";
 "Redo" = "Ponów";
 "Cut" = "Wytnij";
+"Copy an item, then press ⌘V here." = "Skopiuj rzecz, a następnie naciśnij tutaj ⌘V.";

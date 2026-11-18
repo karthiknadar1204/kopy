@@ -387,3 +387,4 @@
 "Undo" = "Widerrufen";
 "Redo" = "Wiederholen";
 "Cut" = "Ausschneiden";
+"Copy an item, then press ⌘V here." = "Kopiere ein Objekt und drücke hier ⌘V.";

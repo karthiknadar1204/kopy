@@ -387,3 +387,4 @@
 "Undo" = "Visszavonás";
 "Redo" = "Újra";
 "Cut" = "Kivágás";
+"Copy an item, then press ⌘V here." = "Másolj egy elemet, majd nyomd meg itt a ⌘V billentyűket.";

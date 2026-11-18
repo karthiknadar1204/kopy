@@ -20,6 +20,7 @@ final class KopyModel {
     private(set) var isShelfOpen = false
     private(set) var noteDraft: NoteDraft?
     private(set) var importRevision = 0
+    private(set) var importFilter: ClipboardFilter = .all
     private(set) var expandedPinnedFilters: Set<String> = []
     var isDropTargeted = false
     var message: String?
@@ -29,7 +30,7 @@ final class KopyModel {
 #endif
     private let isolatedProfile: URL?
 
-    @ObservationIgnored let clipboard = ClipboardController()
+    @ObservationIgnored let clipboard: ClipboardController
     @ObservationIgnored let defaults: UserDefaults
     @ObservationIgnored private var isSuspended = false
     @ObservationIgnored private var history: HistoryStore?
@@ -50,9 +51,10 @@ final class KopyModel {
     @ObservationIgnored var detachedFeedback: ((String) -> Void)?
     @ObservationIgnored var keepShelfOpen: ((Duration) -> Void)?
 
-    init(demo: Bool = false, isolatedProfile: URL? = nil) {
+    init(demo: Bool = false, isolatedProfile: URL? = nil, clipboard: ClipboardController = ClipboardController()) {
         isDemo = demo
         self.isolatedProfile = isolatedProfile
+        self.clipboard = clipboard
         defaults = isolatedProfile.map { UserDefaults(suiteName: "Kopy.Test.\($0.lastPathComponent)") ?? .standard } ?? .standard
 #if !KOPY_APP_STORE
         updater = KopyUpdater(enabled: !demo && isolatedProfile == nil, defaults: defaults)
@@ -246,18 +248,24 @@ final class KopyModel {
     }
 
     func importClipboard() {
+        pasteClipboard(into: .all)
+    }
+
+    func pasteClipboard(into filter: ClipboardFilter) {
         guard !isDemo else { return }
         guard let payload = clipboard.importCurrent() else {
             inform("There’s no supported item to import from the clipboard.")
             return
         }
-        importPayloads([payload])
+        let destination = filter == .all ? .all : ClipboardItem(payload: payload).category
+        importPayloads([payload], showing: destination)
     }
 
-    func importPayloads(_ payloads: [ClipboardPayload]) {
+    func importPayloads(_ payloads: [ClipboardPayload], showing filter: ClipboardFilter = .all) {
         guard !isDemo, !payloads.isEmpty else { return }
         let settings = preferences
         mutate({ try await $0.importPayloads(payloads, preferences: settings) }) { [weak self] _ in
+            self?.importFilter = filter
             self?.importRevision &+= 1
         }
     }

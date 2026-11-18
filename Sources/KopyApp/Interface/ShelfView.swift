@@ -22,7 +22,10 @@ struct ShelfView: View {
     @State private var splitHovered = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.layoutDirection) private var layoutDirection
-    @FocusState private var searchFocused: Bool
+    @FocusState private var focus: Focus?
+
+    private enum Focus: Hashable { case search, history }
+    private var searchFocused: Bool { focus == .search }
 
     private var horizontal: Bool { model.preferences.edge == .top }
     private var scrollEdge: ShelfScrollMarks.Edge {
@@ -54,6 +57,10 @@ struct ShelfView: View {
             } else {
                 historyHeader(matches)
                 history(matches)
+                    .focusable(interactions: .edit)
+                    .focusEffectDisabled()
+                    .focused($focus, equals: .history)
+                    .onCommand(#selector(NSText.paste(_:))) { model.pasteClipboard(into: filter) }
             }
             if let message = model.message {
                 Text(message)
@@ -89,19 +96,19 @@ struct ShelfView: View {
                     .allowsHitTesting(false)
             }
         }
-        .onChange(of: searchFocused) { _, active in
-            if model.noteDraft == nil { model.setKeyboardEntry(active) }
+        .onChange(of: focus) { _, next in
+            if model.noteDraft == nil { model.setKeyboardEntry(next != nil) }
         }
         .onChange(of: model.isShelfOpen) { _, isOpen in shelfVisibilityChanged(isOpen) }
         .onChange(of: model.importRevision) { _, _ in
             scrollAnchor = nil
             closeSubview(savingNote: true)
-            searchFocused = false
             query = ""
-            filter = .all
+            filter = model.importFilter
             expandedStackID = nil
-            filterPositions[.all] = nil
+            filterPositions[filter] = nil
             scrollID = model.items.first?.id
+            focusHistory()
         }
         .onChange(of: filter) { _, next in
             let location = filterPositions[next]
@@ -176,7 +183,7 @@ struct ShelfView: View {
 #endif
             ShelfIconButton(title: "Import clipboard", symbol: "document.on.clipboard") { model.importClipboard() }
             ShelfIconButton(title: "Emoji", symbol: "face.smiling") {
-                searchFocused = false
+                focus = nil
                 previewID = nil
                 expandedStackID = nil
                 model.finishNote(saving: true)
@@ -202,14 +209,14 @@ struct ShelfView: View {
                 .accessibilityHidden(true)
             TextField("Search history", text: $query)
                 .textFieldStyle(.plain)
-                .focused($searchFocused)
+                .focused($focus, equals: .search)
                 .foregroundStyle(ShelfTheme.ink)
                 .simultaneousGesture(TapGesture().onEnded {
                     guard !searchFocused else { return }
                     model.setKeyboardEntry(true)
                     Task { @MainActor in
                         await Task.yield()
-                        searchFocused = true
+                        focus = .search
                     }
                 })
                 .onSubmit {
@@ -282,7 +289,12 @@ struct ShelfView: View {
         }
         filter = option
         model.play(.click)
-        searchFocused = false
+        focusHistory()
+    }
+
+    private func focusHistory() {
+        model.setKeyboardEntry(true)
+        focus = .history
     }
 
     private func clearMenu(_ matches: [ClipboardItem]) -> some View {
@@ -421,7 +433,7 @@ struct ShelfView: View {
             }
             lastClosed = ClosedPosition(at: .now, newestActivity: newestActivity, anchor: anchor)
             priorPosition = nil
-            searchFocused = false
+            focus = nil
             previewID = nil
             expandedStackID = nil
         }
@@ -433,7 +445,7 @@ struct ShelfView: View {
             ShelfEmptyState(
                 symbol: model.preferences.incognito ? "pause" : "tray",
                 title: model.preferences.incognito ? "Paused" : "Nothing copied yet",
-                detail: model.preferences.incognito ? "Clipboard history stays on this Mac." : "Copy an item or drop a file here."
+                detail: "Copy an item, then press ⌘V here."
             ) {
                 if model.preferences.incognito {
                     VStack(spacing: 8) {
@@ -453,7 +465,7 @@ struct ShelfView: View {
             ShelfEmptyState(
                 symbol: hasQuery ? "magnifyingglass" : filter.shelfSymbol,
                 title: "No matching items",
-                detail: "Try a different filter or search."
+                detail: hasQuery ? "Try a different filter or search." : "Copy an item, then press ⌘V here."
             ) {
                 if hasQuery {
                     Button("Clear search", systemImage: "xmark.circle") { query = "" }
@@ -540,9 +552,9 @@ struct ShelfView: View {
             model.play(closing ? .collapse : .expand)
         } preview: {
             previewID = item.id
-            searchFocused = false
+            focus = nil
         } editNote: {
-            searchFocused = false
+            focus = nil
             model.editNote(item)
         }
         .background(ShelfScrollMarker(id: item.id, marks: scrollMarks).allowsHitTesting(false))
@@ -555,7 +567,7 @@ struct ShelfView: View {
         } else if !query.isEmpty {
             query = ""
         } else {
-            searchFocused = false
+            focus = nil
         }
     }
 

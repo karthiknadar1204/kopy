@@ -387,3 +387,4 @@
 "Undo" = "Deshacer";
 "Redo" = "Rehacer";
 "Cut" = "Cortar";
+"Copy an item, then press ⌘V here." = "Copia un elemento y pulsa ⌘V aquí.";

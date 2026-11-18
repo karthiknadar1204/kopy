@@ -387,3 +387,4 @@
 "Undo" = "Zpět";
 "Redo" = "Znovu";
 "Cut" = "Vyjmout";
+"Copy an item, then press ⌘V here." = "Zkopírujte položku a potom zde stiskněte ⌘V.";

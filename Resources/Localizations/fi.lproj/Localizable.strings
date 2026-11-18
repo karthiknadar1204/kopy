@@ -387,3 +387,4 @@
 "Undo" = "Kumoa";
 "Redo" = "Tee uudelleen";
 "Cut" = "Leikkaa";
+"Copy an item, then press ⌘V here." = "Kopioi kohde ja paina sitten tässä ⌘V.";

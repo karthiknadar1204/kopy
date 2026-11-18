@@ -391,3 +391,4 @@
 "Undo" = "Undo";
 "Redo" = "Redo";
 "Cut" = "Cut";
+"Copy an item, then press ⌘V here." = "Copy an item, then press ⌘V here.";
