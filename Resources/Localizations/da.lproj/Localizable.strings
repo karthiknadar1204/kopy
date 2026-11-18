@@ -395,3 +395,9 @@
 "Snippet is too long." = "Tekststykket er for langt.";
 "Write a snippet or paste copied text." = "Skriv et tekststykke, eller indsæt kopieret tekst.";
 "Saved snippets stay pinned." = "Gemte tekststykker forbliver fastgjort.";
+"Edit snippet" = "Rediger tekststykke";
+"Save changes" = "Gem ændringer";
+"All time" = "Alle tidspunkter";
+"Show all time" = "Vis alle tidspunkter";
+"Show history" = "Vis historik";
+"Another item already has this text. Edit that item or change the text." = "Et andet emne har allerede denne tekst. Rediger det emne, eller skift teksten.";

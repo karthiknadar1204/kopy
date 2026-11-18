@@ -8,6 +8,7 @@ public enum HistoryError: LocalizedError, Equatable {
     case missingItem
     case incompatibleStack
     case stackFull
+    case duplicateSnippet
 
     public var errorDescription: String? {
         switch self {
@@ -17,6 +18,7 @@ public enum HistoryError: LocalizedError, Equatable {
         case .missingItem: "This clipboard item is no longer available."
         case .incompatibleStack: "Only files and images can be combined."
         case .stackFull: "A stack can contain up to 10 items."
+        case .duplicateSnippet: "Another item already has this text. Edit that item or change the text."
         }
     }
 }
@@ -79,14 +81,28 @@ public actor HistoryStore {
 
     @discardableResult
     public func saveSnippet(
-        _ text: String, preferences: ShelfPreferences, at: Date = .now
+        _ text: String, replacing itemID: UUID? = nil, preferences: ShelfPreferences, at: Date = .now
     ) throws -> [ClipboardItem] {
         guard text.count <= 500_000, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw HistoryError.invalidItem
         }
         var next = entries
-        add(.text(ClipboardText(text)), at: at, to: &next)
-        next[0].item.pinned = true
+        let payload = ClipboardPayload.text(ClipboardText(text))
+        if let itemID {
+            guard let index = next.firstIndex(where: { $0.item.id == itemID }) else { throw HistoryError.missingItem }
+            guard case .text = next[index].item.payload else { throw HistoryError.invalidItem }
+            let identity = Self.identity(payload, key: identityKey)
+            guard !next.contains(where: { $0.item.id != itemID && $0.identity == identity }) else {
+                throw HistoryError.duplicateSnippet
+            }
+            var item = next.remove(at: index).item
+            item.payload = payload
+            item.activityAt = at
+            next.insert(makeEntry(item), at: 0)
+        } else {
+            add(payload, at: at, to: &next)
+            next[0].item.pinned = true
+        }
         Self.prune(&next, preferences: preferences, at: at)
         return try save(next)
     }

@@ -279,6 +279,9 @@ struct ClipCard: View {
         Button("Copy", systemImage: "square.on.square") { model.copy(item) }
 #endif
         Button("Preview", systemImage: "arrow.up.left.and.arrow.down.right", action: preview)
+        if item.category == .text {
+            Button("Edit snippet", systemImage: "square.and.pencil") { model.editSnippet(item) }
+        }
         Divider()
         Button(item.pinned ? "Unpin" : "Pin", systemImage: item.pinned ? "pin.slash" : "pin") { model.pin(item) }
         Button(item.note == nil ? "Add note" : "Edit note", systemImage: "note.text", action: editNote)

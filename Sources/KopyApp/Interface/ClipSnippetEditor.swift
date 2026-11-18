@@ -7,12 +7,14 @@ struct ClipSnippetEditor: View {
     @FocusState private var editing: Bool
 
     private var draft: Binding<String> {
-        Binding(get: { model.snippetDraft ?? "" }, set: { model.updateSnippetDraft($0) })
+        Binding(get: { model.snippetDraft?.text ?? "" }, set: { model.updateSnippetDraft($0) })
     }
+
+    private var isEditing: Bool { model.snippetDraft?.itemID != nil }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("New snippet", systemImage: "square.and.pencil")
+            Label(isEditing ? "Edit snippet" : "New snippet", systemImage: "square.and.pencil")
                 .font(.system(size: 15, weight: .semibold))
                 .accessibilityAddTraits(.isHeader)
 
@@ -53,15 +55,17 @@ struct ClipSnippetEditor: View {
                 Button("Cancel", action: model.cancelSnippet)
                     .buttonStyle(ShelfSecondaryButtonStyle())
                     .disabled(model.isSavingSnippet)
-                Button("Save snippet", action: model.saveSnippet)
+                Button(isEditing ? "Save changes" : "Save snippet", action: model.saveSnippet)
                     .buttonStyle(ShelfPrimaryButtonStyle())
                     .keyboardShortcut(.return, modifiers: .command)
                     .help(Text(verbatim: "⌘↵"))
                     .disabled(!model.canSaveSnippet)
             }
-            Text("Saved snippets stay pinned.")
-                .font(.caption)
-                .foregroundStyle(ShelfTheme.muted)
+            if !isEditing {
+                Text("Saved snippets stay pinned.")
+                    .font(.caption)
+                    .foregroundStyle(ShelfTheme.muted)
+            }
         }
         .padding(14)
         .background(ShelfTheme.surface, in: .rect(cornerRadius: 13))

@@ -8,6 +8,8 @@ struct ShelfView: View {
 
     @State private var query = ""
     @State private var filter: ClipboardFilter = .all
+    @State private var timeRange: ClipboardTimeRange = .allTime
+    @State private var filterDate = Date.now
     @State private var previewID: UUID?
     @State private var expandedStackID: UUID?
     @State private var emojiOpen = false
@@ -31,7 +33,9 @@ struct ShelfView: View {
     private var scrollEdge: ShelfScrollMarks.Edge {
         horizontal ? (layoutDirection == .leftToRight ? .left : .right) : .top
     }
-    private var matchingItems: [ClipboardItem] { model.items.filter { $0.matches(query, filter: filter) } }
+    private var matchingItems: [ClipboardItem] {
+        model.items.filter { $0.matches(query, filter: filter) && timeRange.includes($0.activityAt, at: filterDate) }
+    }
     private var pinnedFolded: Bool { !model.expandedPinnedFilters.contains(filter.rawValue) }
     private var newestActivity: Date? { model.items.max { $0.activityAt < $1.activityAt }?.activityAt }
     private var headID: UUID? {
@@ -111,6 +115,7 @@ struct ShelfView: View {
             scrollAnchor = nil
             closeSubview(savingNote: true)
             query = ""
+            timeRange = .allTime
             filter = model.importFilter
             expandedStackID = nil
             filterPositions[filter] = nil
@@ -123,6 +128,21 @@ struct ShelfView: View {
             scrollID = location?.id ?? headID
             priorPosition = nil
             expandedStackID = nil
+        }
+        .onChange(of: timeRange) { _, _ in
+            filterDate = .now
+            filterPositions.removeAll()
+            scrollAnchor = nil
+            scrollID = headID
+            priorPosition = nil
+        }
+        .task(id: model.isShelfOpen && timeRange != .allTime) {
+            guard model.isShelfOpen, timeRange != .allTime else { return }
+            filterDate = .now
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: .seconds(60)) } catch { return }
+                filterDate = .now
+            }
         }
         .onChange(of: newestActivity) { previous, next in
             guard model.isShelfOpen, let next, previous.map({ next > $0 }) ?? true else { return }
@@ -138,6 +158,20 @@ struct ShelfView: View {
             header(inlineSearch: horizontal)
             if !horizontal { searchBar.padding(.horizontal, 14) }
             filterBar(matches)
+            if timeRange != .allTime {
+                HStack(spacing: 8) {
+                    Label(LocalizedStringKey(timeRange.title), systemImage: "clock")
+                        .lineLimit(1)
+                    Spacer(minLength: 4)
+                    Button("Show all time", systemImage: "xmark.circle.fill") { timeRange = .allTime }
+                        .buttonStyle(.plain)
+                }
+                .font(.caption)
+                .foregroundStyle(ShelfTheme.accent)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(ShelfTheme.highlight)
+            }
         }
         .background(ShelfTheme.toolbar)
         .overlay(alignment: .bottom) {
@@ -264,7 +298,7 @@ struct ShelfView: View {
                 ShelfIconButton(title: "New snippet", symbol: "square.and.pencil", tint: ShelfTheme.accent, size: 26,
                                 action: newSnippet)
             }
-            clearMenu(matches)
+            historyMenu(matches)
         }
         .padding(.horizontal, 13)
         .padding(.vertical, 7)
@@ -318,13 +352,17 @@ struct ShelfView: View {
         model.beginSnippet()
     }
 
-    private func clearMenu(_ matches: [ClipboardItem]) -> some View {
+    private func historyMenu(_ matches: [ClipboardItem]) -> some View {
         Menu {
-            Button("Last hour", systemImage: "clock") { model.clear(matches, since: .now.addingTimeInterval(-3_600)) }
-            Button("Last 6 hours", systemImage: "clock") { model.clear(matches, since: .now.addingTimeInterval(-21_600)) }
-            Button("Last 24 hours", systemImage: "clock") { model.clear(matches, since: .now.addingTimeInterval(-86_400)) }
+            Picker("Show history", selection: $timeRange) {
+                ForEach(ClipboardTimeRange.allCases) { range in
+                    Text(LocalizedStringKey(range.title)).tag(range)
+                }
+            }
+            .pickerStyle(.inline)
             Divider()
             Button("Clear shown history", systemImage: "trash", role: .destructive) { confirmClear = true }
+                .disabled(!matches.contains { !$0.isProtected })
         } label: {
             Image(systemName: "ellipsis")
                 .frame(width: 26, height: 26)
@@ -336,8 +374,7 @@ struct ShelfView: View {
         .menuIndicator(.hidden)
         .fixedSize()
         .foregroundStyle(ShelfTheme.muted)
-        .disabled(!matches.contains { !$0.isProtected })
-        .help("Clear history")
+        .help("History actions")
         .confirmationDialog("Clear shown history?", isPresented: $confirmClear) {
             Button("Clear history", role: .destructive) { model.clear(matchingItems) }
         } message: {
@@ -462,7 +499,11 @@ struct ShelfView: View {
 
     @ViewBuilder
     private var emptyHistory: some View {
-        if filter == .text, query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if timeRange != .allTime {
+            ShelfEmptyState(symbol: "clock", title: "No matching items", detail: "Try a different filter or search.") {
+                Button("Show all time", systemImage: "xmark.circle", action: { timeRange = .allTime })
+            }
+        } else if filter == .text, query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             ShelfEmptyState(symbol: "text.alignleft", title: "No matching items", detail: "Write a snippet or paste copied text.") {
                 Button("New snippet", systemImage: "square.and.pencil", action: newSnippet)
             }
@@ -593,6 +634,8 @@ struct ShelfView: View {
             closeSubview(savingNote: false)
         } else if !query.isEmpty {
             query = ""
+        } else if timeRange != .allTime {
+            timeRange = .allTime
         } else {
             focus = nil
         }

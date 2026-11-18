@@ -395,3 +395,9 @@
 "Snippet is too long." = "Фрагмент слишком длинный.";
 "Write a snippet or paste copied text." = "Напишите фрагмент или вставьте скопированный текст.";
 "Saved snippets stay pinned." = "Сохранённые фрагменты остаются закреплёнными.";
+"Edit snippet" = "Изменить фрагмент";
+"Save changes" = "Сохранить изменения";
+"All time" = "Всё время";
+"Show all time" = "Показать за всё время";
+"Show history" = "Показать историю";
+"Another item already has this text. Edit that item or change the text." = "Другой объект уже содержит этот текст. Измените тот объект или поменяйте текст.";

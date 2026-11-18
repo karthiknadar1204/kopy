@@ -395,3 +395,9 @@
 "Snippet is too long." = "Katkelma on liian pitkä.";
 "Write a snippet or paste copied text." = "Kirjoita katkelma tai sijoita kopioitu teksti.";
 "Saved snippets stay pinned." = "Tallennetut katkelmat pysyvät kiinnitettyinä.";
+"Edit snippet" = "Muokkaa katkelmaa";
+"Save changes" = "Tallenna muutokset";
+"All time" = "Koko ajalta";
+"Show all time" = "Näytä koko ajalta";
+"Show history" = "Näytä historia";
+"Another item already has this text. Edit that item or change the text." = "Toisessa kohteessa on jo tämä teksti. Muokkaa sitä tai muuta tekstiä.";

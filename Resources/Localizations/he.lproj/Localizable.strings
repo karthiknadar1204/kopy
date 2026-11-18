@@ -395,3 +395,9 @@
 "Snippet is too long." = "הקטע ארוך מדי.";
 "Write a snippet or paste copied text." = "כתבו קטע או הדביקו טקסט שהועתק.";
 "Saved snippets stay pinned." = "קטעים שנשמרו נשארים מוצמדים.";
+"Edit snippet" = "עריכת קטע";
+"Save changes" = "שמירת שינויים";
+"All time" = "כל הזמנים";
+"Show all time" = "הצגת כל הזמנים";
+"Show history" = "הצגת היסטוריה";
+"Another item already has this text. Edit that item or change the text." = "פריט אחר כבר מכיל את הטקסט הזה. ערכו אותו או שנו את הטקסט.";

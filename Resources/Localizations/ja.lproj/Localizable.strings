@@ -395,3 +395,9 @@
 "Snippet is too long." = "スニペットが長すぎます。";
 "Write a snippet or paste copied text." = "スニペットを入力するか、コピーしたテキストをペーストしてください。";
 "Saved snippets stay pinned." = "保存したスニペットはピン留めされます。";
+"Edit snippet" = "スニペットを編集";
+"Save changes" = "変更を保存";
+"All time" = "すべての期間";
+"Show all time" = "すべての期間を表示";
+"Show history" = "履歴を表示";
+"Another item already has this text. Edit that item or change the text." = "このテキストは別の項目にすでに存在します。その項目を編集するか、テキストを変更してください。";

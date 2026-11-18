@@ -395,3 +395,9 @@
 "Snippet is too long." = "Metin parçası çok uzun.";
 "Write a snippet or paste copied text." = "Bir metin parçası yazın veya kopyalanan metni yapıştırın.";
 "Saved snippets stay pinned." = "Kaydedilen metin parçaları sabitlenmiş kalır.";
+"Edit snippet" = "Metin parçasını düzenle";
+"Save changes" = "Değişiklikleri kaydet";
+"All time" = "Tüm zamanlar";
+"Show all time" = "Tüm zamanları göster";
+"Show history" = "Geçmişi göster";
+"Another item already has this text. Edit that item or change the text." = "Başka bir öğede bu metin zaten var. O öğeyi düzenleyin veya metni değiştirin.";

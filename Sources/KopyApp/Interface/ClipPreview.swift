@@ -148,6 +148,9 @@ struct ClipPreview: View {
 
     private var actions: some View {
         HStack(spacing: 7) {
+            if item.category == .text {
+                ShelfIconButton(title: "Edit snippet", symbol: "square.and.pencil") { model.editSnippet(item) }
+            }
             Button(selected.isEmpty ? ShelfClipboardAction.title : ShelfClipboardAction.selectionTitle, systemImage: ShelfClipboardAction.symbol) {
                 model.paste(item, members: visibleSelection)
             }

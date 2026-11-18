@@ -395,3 +395,9 @@
 "Snippet is too long." = "片段過長。";
 "Write a snippet or paste copied text." = "編寫片段或貼上拷貝的文字。";
 "Saved snippets stay pinned." = "儲存的片段會保持置頂。";
+"Edit snippet" = "編輯片段";
+"Save changes" = "儲存更改";
+"All time" = "全部時間";
+"Show all time" = "顯示全部時間";
+"Show history" = "顯示歷史記錄";
+"Another item already has this text. Edit that item or change the text." = "其他項目已有此文字。請編輯該項目或更改文字。";

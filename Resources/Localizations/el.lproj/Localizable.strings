@@ -395,3 +395,9 @@
 "Snippet is too long." = "Το απόσπασμα είναι πολύ μεγάλο.";
 "Write a snippet or paste copied text." = "Γράψτε ένα απόσπασμα ή επικολλήστε αντιγραμμένο κείμενο.";
 "Saved snippets stay pinned." = "Τα αποθηκευμένα αποσπάσματα παραμένουν καρφιτσωμένα.";
+"Edit snippet" = "Επεξεργασία αποσπάσματος";
+"Save changes" = "Αποθήκευση αλλαγών";
+"All time" = "Όλο το ιστορικό";
+"Show all time" = "Εμφάνιση όλου του ιστορικού";
+"Show history" = "Εμφάνιση ιστορικού";
+"Another item already has this text. Edit that item or change the text." = "Ένα άλλο στοιχείο έχει ήδη αυτό το κείμενο. Επεξεργαστείτε το ή αλλάξτε το κείμενο.";

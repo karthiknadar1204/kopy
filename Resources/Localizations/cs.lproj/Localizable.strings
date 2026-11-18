@@ -395,3 +395,9 @@
 "Snippet is too long." = "Úryvek je příliš dlouhý.";
 "Write a snippet or paste copied text." = "Napište úryvek nebo vložte zkopírovaný text.";
 "Saved snippets stay pinned." = "Uložené úryvky zůstávají připnuté.";
+"Edit snippet" = "Upravit úryvek";
+"Save changes" = "Uložit změny";
+"All time" = "Kdykoli";
+"Show all time" = "Zobrazit vše";
+"Show history" = "Zobrazit historii";
+"Another item already has this text. Edit that item or change the text." = "Jiná položka už tento text obsahuje. Upravte ji nebo změňte text.";

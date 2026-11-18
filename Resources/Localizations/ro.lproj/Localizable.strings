@@ -395,3 +395,9 @@
 "Snippet is too long." = "Fragmentul este prea lung.";
 "Write a snippet or paste copied text." = "Scrie un fragment sau lipește text copiat.";
 "Saved snippets stay pinned." = "Fragmentele salvate rămân fixate.";
+"Edit snippet" = "Editează fragmentul";
+"Save changes" = "Salvează modificările";
+"All time" = "Toată perioada";
+"Show all time" = "Arată toată perioada";
+"Show history" = "Arată istoricul";
+"Another item already has this text. Edit that item or change the text." = "Un alt element conține deja acest text. Editează acel element sau schimbă textul.";

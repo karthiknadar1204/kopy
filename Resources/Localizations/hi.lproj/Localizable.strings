@@ -395,3 +395,9 @@
 "Snippet is too long." = "स्निपेट बहुत लंबा है।";
 "Write a snippet or paste copied text." = "स्निपेट लिखें या कॉपी किया हुआ टेक्स्ट पेस्ट करें।";
 "Saved snippets stay pinned." = "सहेजे गए स्निपेट पिन किए रहते हैं।";
+"Edit snippet" = "स्निपेट संपादित करें";
+"Save changes" = "बदलाव सहेजें";
+"All time" = "सभी समय";
+"Show all time" = "सभी समय दिखाएँ";
+"Show history" = "इतिहास दिखाएँ";
+"Another item already has this text. Edit that item or change the text." = "किसी अन्य आइटम में यह टेक्स्ट पहले से है। उसे संपादित करें या टेक्स्ट बदलें।";

@@ -395,3 +395,9 @@
 "Snippet is too long." = "O trecho é muito longo.";
 "Write a snippet or paste copied text." = "Escreva um trecho ou cole texto copiado.";
 "Saved snippets stay pinned." = "Os trechos salvos permanecem fixados.";
+"Edit snippet" = "Editar trecho";
+"Save changes" = "Salvar alterações";
+"All time" = "Todo o período";
+"Show all time" = "Mostrar todo o período";
+"Show history" = "Mostrar histórico";
+"Another item already has this text. Edit that item or change the text." = "Outro item já contém este texto. Edite esse item ou altere o texto.";

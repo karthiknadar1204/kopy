@@ -395,3 +395,9 @@
 "Snippet is too long." = "A szövegrészlet túl hosszú.";
 "Write a snippet or paste copied text." = "Írj egy szövegrészletet vagy illessz be másolt szöveget.";
 "Saved snippets stay pinned." = "A mentett szövegrészletek rögzítve maradnak.";
+"Edit snippet" = "Szövegrészlet szerkesztése";
+"Save changes" = "Módosítások mentése";
+"All time" = "Teljes időszak";
+"Show all time" = "Teljes időszak mutatása";
+"Show history" = "Előzmények mutatása";
+"Another item already has this text. Edit that item or change the text." = "Egy másik elem már tartalmazza ezt a szöveget. Szerkeszd azt az elemet vagy módosítsd a szöveget.";

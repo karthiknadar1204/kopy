@@ -395,3 +395,9 @@
 "Snippet is too long." = "Het tekstfragment is te lang.";
 "Write a snippet or paste copied text." = "Schrijf een tekstfragment of plak gekopieerde tekst.";
 "Saved snippets stay pinned." = "Bewaarde tekstfragmenten blijven vastgezet.";
+"Edit snippet" = "Wijzig tekstfragment";
+"Save changes" = "Bewaar wijzigingen";
+"All time" = "Alle perioden";
+"Show all time" = "Toon alle perioden";
+"Show history" = "Toon geschiedenis";
+"Another item already has this text. Edit that item or change the text." = "Een ander onderdeel bevat deze tekst al. Wijzig dat onderdeel of pas de tekst aan.";

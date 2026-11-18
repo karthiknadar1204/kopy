@@ -395,3 +395,9 @@
 "Snippet is too long." = "L’extrait est trop long.";
 "Write a snippet or paste copied text." = "Écrivez un extrait ou collez du texte copié.";
 "Saved snippets stay pinned." = "Les extraits enregistrés restent épinglés.";
+"Edit snippet" = "Modifier l’extrait";
+"Save changes" = "Enregistrer les modifications";
+"All time" = "Toute la période";
+"Show all time" = "Afficher toute la période";
+"Show history" = "Afficher l’historique";
+"Another item already has this text. Edit that item or change the text." = "Un autre élément contient déjà ce texte. Modifiez cet élément ou changez le texte.";

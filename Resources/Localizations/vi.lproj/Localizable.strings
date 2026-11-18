@@ -395,3 +395,9 @@
 "Snippet is too long." = "Đoạn quá dài.";
 "Write a snippet or paste copied text." = "Viết một đoạn hoặc dán văn bản đã sao chép.";
 "Saved snippets stay pinned." = "Các đoạn đã lưu luôn được ghim.";
+"Edit snippet" = "Sửa đoạn";
+"Save changes" = "Lưu thay đổi";
+"All time" = "Toàn bộ thời gian";
+"Show all time" = "Hiện toàn bộ thời gian";
+"Show history" = "Hiện lịch sử";
+"Another item already has this text. Edit that item or change the text." = "Một mục khác đã có văn bản này. Hãy sửa mục đó hoặc thay đổi văn bản.";

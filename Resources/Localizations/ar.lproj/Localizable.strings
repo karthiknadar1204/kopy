@@ -395,3 +395,9 @@
 "Snippet is too long." = "المقتطف طويل جدًا.";
 "Write a snippet or paste copied text." = "اكتب مقتطفًا أو الصق نصًا منسوخًا.";
 "Saved snippets stay pinned." = "تبقى المقتطفات المحفوظة مثبتة.";
+"Edit snippet" = "تعديل المقتطف";
+"Save changes" = "حفظ التغييرات";
+"All time" = "كل الأوقات";
+"Show all time" = "عرض كل الأوقات";
+"Show history" = "عرض السجل";
+"Another item already has this text. Edit that item or change the text." = "يوجد عنصر آخر بهذا النص. عدّل ذلك العنصر أو غيّر النص.";

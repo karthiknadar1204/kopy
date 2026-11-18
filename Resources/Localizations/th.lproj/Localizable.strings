@@ -395,3 +395,9 @@
 "Snippet is too long." = "ข้อความสั้นยาวเกินไป";
 "Write a snippet or paste copied text." = "เขียนข้อความสั้นหรือวางข้อความที่คัดลอกมา";
 "Saved snippets stay pinned." = "ข้อความสั้นที่บันทึกจะถูกปักหมุดไว้";
+"Edit snippet" = "แก้ไขข้อความสั้น";
+"Save changes" = "บันทึกการเปลี่ยนแปลง";
+"All time" = "ทุกช่วงเวลา";
+"Show all time" = "แสดงทุกช่วงเวลา";
+"Show history" = "แสดงประวัติ";
+"Another item already has this text. Edit that item or change the text." = "มีรายการอื่นที่มีข้อความนี้อยู่แล้ว โปรดแก้ไขรายการนั้นหรือเปลี่ยนข้อความ";

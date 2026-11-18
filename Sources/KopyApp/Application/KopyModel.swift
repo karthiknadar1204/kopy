@@ -19,7 +19,7 @@ final class KopyModel {
     private(set) var isLoadingHistory = false
     private(set) var isShelfOpen = false
     private(set) var noteDraft: NoteDraft?
-    private(set) var snippetDraft: String?
+    private(set) var snippetDraft: SnippetDraft?
     private(set) var isSavingSnippet = false
     private(set) var importRevision = 0
     private(set) var importFilter: ClipboardFilter = .all
@@ -274,16 +274,22 @@ final class KopyModel {
 
     var canSaveSnippet: Bool {
         guard let snippetDraft, !isSavingSnippet else { return false }
-        return snippetDraft.count <= 500_000 && !snippetDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return snippetDraft.text.count <= 500_000 && !snippetDraft.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     func beginSnippet() {
-        if snippetDraft == nil { snippetDraft = "" }
+        if snippetDraft == nil { snippetDraft = SnippetDraft(itemID: nil, text: "") }
+    }
+
+    func editSnippet(_ item: ClipboardItem) {
+        guard snippetDraft == nil, let current = items.first(where: { $0.id == item.id }), current.category == .text,
+              case .text(let text) = current.payload else { return }
+        snippetDraft = SnippetDraft(itemID: current.id, text: text.value)
     }
 
     func updateSnippetDraft(_ text: String) {
         guard snippetDraft != nil, !isSavingSnippet else { return }
-        snippetDraft = text
+        snippetDraft?.text = text
     }
 
     func cancelSnippet() {
@@ -293,10 +299,10 @@ final class KopyModel {
 
     func saveSnippet() {
         guard canSaveSnippet, let snippetDraft else { return }
-        let payload = ClipboardPayload.text(ClipboardText(snippetDraft))
+        let payload = ClipboardPayload.text(ClipboardText(snippetDraft.text))
         let settings = preferences
         isSavingSnippet = true
-        mutate({ try await $0.saveSnippet(snippetDraft, preferences: settings) }, onFailure: { [weak self] in
+        mutate({ try await $0.saveSnippet(snippetDraft.text, replacing: snippetDraft.itemID, preferences: settings) }, onFailure: { [weak self] in
             self?.isSavingSnippet = false
         }) { [weak self] _ in
             guard let self else { return }
@@ -601,5 +607,10 @@ private struct DragSelection: Sendable {
 
 struct NoteDraft: Sendable {
     let itemID: UUID
+    var text: String
+}
+
+struct SnippetDraft: Equatable, Sendable {
+    let itemID: UUID?
     var text: String
 }

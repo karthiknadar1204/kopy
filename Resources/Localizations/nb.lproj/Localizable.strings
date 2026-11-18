@@ -395,3 +395,9 @@
 "Snippet is too long." = "Tekstbiten er for lang.";
 "Write a snippet or paste copied text." = "Skriv en tekstbit eller lim inn kopiert tekst.";
 "Saved snippets stay pinned." = "Lagrede tekstbiter forblir festet.";
+"Edit snippet" = "Rediger tekstbit";
+"Save changes" = "Lagre endringer";
+"All time" = "Hele perioden";
+"Show all time" = "Vis hele perioden";
+"Show history" = "Vis historikk";
+"Another item already has this text. Edit that item or change the text." = "Et annet objekt inneholder allerede denne teksten. Rediger det objektet eller endre teksten.";
