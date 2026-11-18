@@ -76,4 +76,4 @@ All 79 tests passed after these changes. The direct release bundle and sandbox p
 
 The user physically dragged a promised file to the shelf, pressed Escape while holding the drag, and released the mouse. They confirmed cancellation without an added item. The source recorded drag operation `0` and never received a file-write request. A read of the isolated profile's persisted history also confirmed that the uniquely named canceled file was absent.
 
-The handle remained discoverable as a native window after Chrome and Safari app switches during the live session. Confirmation of its visible appearance across the user's browser windows is pending. Launch after a fresh macOS login remains untested.
+The handle remained discoverable as a native window after Chrome and Safari app switches during the live session. The user then switched between browser windows without moving the pointer to the edge and confirmed that the gray handle stayed visible. Both reported issues passed their physical retests. Launch after a fresh macOS login remains untested.
