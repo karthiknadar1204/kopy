@@ -388,3 +388,10 @@
 "Redo" = "Yinele";
 "Cut" = "Kes";
 "Copy an item, then press ⌘V here." = "Bir öğeyi kopyalayın, ardından burada ⌘V tuşlarına basın.";
+"New snippet" = "Yeni metin parçası";
+"Snippet text" = "Metin parçası içeriği";
+"Write your snippet…" = "Metin parçanızı yazın…";
+"Save snippet" = "Metin parçasını kaydet";
+"Snippet is too long." = "Metin parçası çok uzun.";
+"Write a snippet or paste copied text." = "Bir metin parçası yazın veya kopyalanan metni yapıştırın.";
+"Saved snippets stay pinned." = "Kaydedilen metin parçaları sabitlenmiş kalır.";

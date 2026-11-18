@@ -388,3 +388,10 @@
 "Redo" = "Opnieuw";
 "Cut" = "Knip";
 "Copy an item, then press ⌘V here." = "Kopieer een onderdeel en druk hier op ⌘V.";
+"New snippet" = "Nieuw tekstfragment";
+"Snippet text" = "Tekst van fragment";
+"Write your snippet…" = "Schrijf je tekstfragment…";
+"Save snippet" = "Bewaar fragment";
+"Snippet is too long." = "Het tekstfragment is te lang.";
+"Write a snippet or paste copied text." = "Schrijf een tekstfragment of plak gekopieerde tekst.";
+"Saved snippets stay pinned." = "Bewaarde tekstfragmenten blijven vastgezet.";

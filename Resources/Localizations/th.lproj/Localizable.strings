@@ -388,3 +388,10 @@
 "Redo" = "ทำซ้ำ";
 "Cut" = "ตัด";
 "Copy an item, then press ⌘V here." = "คัดลอกรายการ แล้วกด ⌘V ที่นี่";
+"New snippet" = "ข้อความสั้นใหม่";
+"Snippet text" = "เนื้อหาข้อความสั้น";
+"Write your snippet…" = "เขียนข้อความสั้นของคุณ…";
+"Save snippet" = "บันทึกข้อความสั้น";
+"Snippet is too long." = "ข้อความสั้นยาวเกินไป";
+"Write a snippet or paste copied text." = "เขียนข้อความสั้นหรือวางข้อความที่คัดลอกมา";
+"Saved snippets stay pinned." = "ข้อความสั้นที่บันทึกจะถูกปักหมุดไว้";

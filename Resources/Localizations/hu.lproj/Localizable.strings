@@ -388,3 +388,10 @@
 "Redo" = "Újra";
 "Cut" = "Kivágás";
 "Copy an item, then press ⌘V here." = "Másolj egy elemet, majd nyomd meg itt a ⌘V billentyűket.";
+"New snippet" = "Új szövegrészlet";
+"Snippet text" = "A szövegrészlet tartalma";
+"Write your snippet…" = "Írd meg a szövegrészleted…";
+"Save snippet" = "Szövegrészlet mentése";
+"Snippet is too long." = "A szövegrészlet túl hosszú.";
+"Write a snippet or paste copied text." = "Írj egy szövegrészletet vagy illessz be másolt szöveget.";
+"Saved snippets stay pinned." = "A mentett szövegrészletek rögzítve maradnak.";

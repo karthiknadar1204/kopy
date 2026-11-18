@@ -388,3 +388,10 @@
 "Redo" = "Refă";
 "Cut" = "Taie";
 "Copy an item, then press ⌘V here." = "Copiază un element, apoi apasă ⌘V aici.";
+"New snippet" = "Fragment nou";
+"Snippet text" = "Textul fragmentului";
+"Write your snippet…" = "Scrie fragmentul…";
+"Save snippet" = "Salvează fragmentul";
+"Snippet is too long." = "Fragmentul este prea lung.";
+"Write a snippet or paste copied text." = "Scrie un fragment sau lipește text copiat.";
+"Saved snippets stay pinned." = "Fragmentele salvate rămân fixate.";

@@ -36,6 +36,7 @@ final class EdgeShelfWindow {
     var onClose: (() -> Void)?
     var onDragChange: ((Bool) -> Void)?
     var onDrop: ((NSPasteboard) -> Bool)?
+    var shouldStayOpen: (() -> Bool)?
 
     init(content: some View) {
         let hosting = NSHostingView(rootView: content)
@@ -386,6 +387,7 @@ final class EdgeShelfWindow {
             let pressed = NSEvent.pressedMouseButtons != 0
             if shelf.frame.contains(point) { waitsForPointerEntry = false }
             if waitsForPointerEntry || keepOpenUntil.map({ now < $0 }) == true || !trackedMenus.isEmpty || dropTarget != nil
+                || shouldStayOpen?() == true
                 || pressed || relocation != nil {
                 outside = nil
             } else if shelf.frame.insetBy(dx: -8, dy: -8).contains(point) || trigger.contains(point) {

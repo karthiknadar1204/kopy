@@ -78,6 +78,20 @@ public actor HistoryStore {
     }
 
     @discardableResult
+    public func saveSnippet(
+        _ text: String, preferences: ShelfPreferences, at: Date = .now
+    ) throws -> [ClipboardItem] {
+        guard text.count <= 500_000, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw HistoryError.invalidItem
+        }
+        var next = entries
+        add(.text(ClipboardText(text)), at: at, to: &next)
+        next[0].item.pinned = true
+        Self.prune(&next, preferences: preferences, at: at)
+        return try save(next)
+    }
+
+    @discardableResult
     public func prune(preferences: ShelfPreferences, at: Date = .now) throws -> [ClipboardItem] {
         var next = entries
         Self.prune(&next, preferences: preferences, at: at)

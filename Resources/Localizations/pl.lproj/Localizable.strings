@@ -388,3 +388,10 @@
 "Redo" = "Ponów";
 "Cut" = "Wytnij";
 "Copy an item, then press ⌘V here." = "Skopiuj rzecz, a następnie naciśnij tutaj ⌘V.";
+"New snippet" = "Nowy fragment";
+"Snippet text" = "Tekst fragmentu";
+"Write your snippet…" = "Napisz swój fragment…";
+"Save snippet" = "Zachowaj fragment";
+"Snippet is too long." = "Fragment jest za długi.";
+"Write a snippet or paste copied text." = "Napisz fragment lub wklej skopiowany tekst.";
+"Saved snippets stay pinned." = "Zachowane fragmenty pozostają przypięte.";

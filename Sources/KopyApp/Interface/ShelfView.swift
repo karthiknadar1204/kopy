@@ -43,7 +43,10 @@ struct ShelfView: View {
     var body: some View {
         let matches = matchingItems
         VStack(alignment: .leading, spacing: 0) {
-            if let id = model.noteDraft?.itemID, let item = model.items.first(where: { $0.id == id }) {
+            if model.snippetDraft != nil {
+                header()
+                ClipSnippetEditor(model: model, horizontal: horizontal)
+            } else if let id = model.noteDraft?.itemID, let item = model.items.first(where: { $0.id == id }) {
                 header()
                 ClipNoteEditor(item: item, model: model, horizontal: horizontal)
                     .id(id)
@@ -97,10 +100,14 @@ struct ShelfView: View {
             }
         }
         .onChange(of: focus) { _, next in
-            if model.noteDraft == nil { model.setKeyboardEntry(next != nil) }
+            if model.noteDraft == nil, model.snippetDraft == nil { model.setKeyboardEntry(next != nil) }
         }
         .onChange(of: model.isShelfOpen) { _, isOpen in shelfVisibilityChanged(isOpen) }
+        .onChange(of: model.snippetDraft != nil) { _, composing in
+            if !composing, model.isShelfOpen { focusHistory() }
+        }
         .onChange(of: model.importRevision) { _, _ in
+            guard model.snippetDraft == nil else { return }
             scrollAnchor = nil
             closeSubview(savingNote: true)
             query = ""
@@ -140,8 +147,12 @@ struct ShelfView: View {
 
     private func header(inlineSearch: Bool = false) -> some View {
         HStack(spacing: 9) {
-            if emojiOpen || previewID != nil || model.noteDraft != nil {
-                ShelfIconButton(title: "Back to history", symbol: "chevron.backward") { closeSubview(savingNote: true) }
+            if emojiOpen || previewID != nil || model.noteDraft != nil || model.snippetDraft != nil {
+                ShelfIconButton(title: "Back to history", symbol: "chevron.backward") {
+                    model.cancelSnippet()
+                    closeSubview(savingNote: true)
+                }
+                .disabled(model.isSavingSnippet)
             }
             KopyBadge()
             Text(verbatim: "Kopy")
@@ -163,6 +174,7 @@ struct ShelfView: View {
                 Spacer(minLength: 0)
             }
             toolbarActions
+                .disabled(model.snippetDraft != nil)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
@@ -248,6 +260,10 @@ struct ShelfView: View {
                 filterButtons(showTitles: false)
             }
             Spacer(minLength: 0)
+            if filter == .text {
+                ShelfIconButton(title: "New snippet", symbol: "square.and.pencil", tint: ShelfTheme.accent, size: 26,
+                                action: newSnippet)
+            }
             clearMenu(matches)
         }
         .padding(.horizontal, 13)
@@ -295,6 +311,11 @@ struct ShelfView: View {
     private func focusHistory() {
         model.setKeyboardEntry(true)
         focus = .history
+    }
+
+    private func newSnippet() {
+        focus = nil
+        model.beginSnippet()
     }
 
     private func clearMenu(_ matches: [ClipboardItem]) -> some View {
@@ -441,7 +462,11 @@ struct ShelfView: View {
 
     @ViewBuilder
     private var emptyHistory: some View {
-        if model.items.isEmpty {
+        if filter == .text, query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            ShelfEmptyState(symbol: "text.alignleft", title: "No matching items", detail: "Write a snippet or paste copied text.") {
+                Button("New snippet", systemImage: "square.and.pencil", action: newSnippet)
+            }
+        } else if model.items.isEmpty {
             ShelfEmptyState(
                 symbol: model.preferences.incognito ? "pause" : "tray",
                 title: model.preferences.incognito ? "Paused" : "Nothing copied yet",
@@ -562,7 +587,9 @@ struct ShelfView: View {
     }
 
     private func escape() {
-        if emojiOpen || previewID != nil || model.noteDraft != nil {
+        if model.snippetDraft != nil {
+            model.cancelSnippet()
+        } else if emojiOpen || previewID != nil || model.noteDraft != nil {
             closeSubview(savingNote: false)
         } else if !query.isEmpty {
             query = ""

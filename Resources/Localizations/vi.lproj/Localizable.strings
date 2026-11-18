@@ -388,3 +388,10 @@
 "Redo" = "Làm lại";
 "Cut" = "Cắt";
 "Copy an item, then press ⌘V here." = "Sao chép một mục, sau đó nhấn ⌘V tại đây.";
+"New snippet" = "Đoạn mới";
+"Snippet text" = "Nội dung đoạn";
+"Write your snippet…" = "Viết đoạn của bạn…";
+"Save snippet" = "Lưu đoạn";
+"Snippet is too long." = "Đoạn quá dài.";
+"Write a snippet or paste copied text." = "Viết một đoạn hoặc dán văn bản đã sao chép.";
+"Saved snippets stay pinned." = "Các đoạn đã lưu luôn được ghim.";

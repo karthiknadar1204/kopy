@@ -388,3 +388,10 @@
 "Redo" = "Gentag";
 "Cut" = "Klip";
 "Copy an item, then press ⌘V here." = "Kopiér et emne, og tryk derefter på ⌘V her.";
+"New snippet" = "Nyt tekststykke";
+"Snippet text" = "Tekststykkets tekst";
+"Write your snippet…" = "Skriv dit tekststykke…";
+"Save snippet" = "Gem tekststykke";
+"Snippet is too long." = "Tekststykket er for langt.";
+"Write a snippet or paste copied text." = "Skriv et tekststykke, eller indsæt kopieret tekst.";
+"Saved snippets stay pinned." = "Gemte tekststykker forbliver fastgjort.";

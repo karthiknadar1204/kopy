@@ -388,3 +388,10 @@
 "Redo" = "Повторити";
 "Cut" = "Вирізати";
 "Copy an item, then press ⌘V here." = "Скопіюйте елемент, потім натисніть тут ⌘V.";
+"New snippet" = "Новий фрагмент";
+"Snippet text" = "Текст фрагмента";
+"Write your snippet…" = "Напишіть фрагмент…";
+"Save snippet" = "Зберегти фрагмент";
+"Snippet is too long." = "Фрагмент надто довгий.";
+"Write a snippet or paste copied text." = "Напишіть фрагмент або вставте скопійований текст.";
+"Saved snippets stay pinned." = "Збережені фрагменти залишаються закріпленими.";

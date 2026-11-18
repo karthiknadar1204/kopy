@@ -388,3 +388,10 @@
 "Redo" = "Gör om";
 "Cut" = "Klipp ut";
 "Copy an item, then press ⌘V here." = "Kopiera ett objekt och tryck sedan på ⌘V här.";
+"New snippet" = "Nytt textutdrag";
+"Snippet text" = "Textutdragets text";
+"Write your snippet…" = "Skriv ditt textutdrag…";
+"Save snippet" = "Spara textutdrag";
+"Snippet is too long." = "Textutdraget är för långt.";
+"Write a snippet or paste copied text." = "Skriv ett textutdrag eller klistra in kopierad text.";
+"Saved snippets stay pinned." = "Sparade textutdrag förblir fästa.";

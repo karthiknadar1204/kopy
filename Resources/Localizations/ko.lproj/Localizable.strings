@@ -388,3 +388,10 @@
 "Redo" = "다시 실행";
 "Cut" = "오려두기";
 "Copy an item, then press ⌘V here." = "항목을 복사한 다음 여기에서 ⌘V를 누르세요.";
+"New snippet" = "새 스니펫";
+"Snippet text" = "스니펫 텍스트";
+"Write your snippet…" = "스니펫을 작성하세요…";
+"Save snippet" = "스니펫 저장";
+"Snippet is too long." = "스니펫이 너무 깁니다.";
+"Write a snippet or paste copied text." = "스니펫을 작성하거나 복사한 텍스트를 붙여넣으세요.";
+"Saved snippets stay pinned." = "저장한 스니펫은 고정된 상태로 유지됩니다.";

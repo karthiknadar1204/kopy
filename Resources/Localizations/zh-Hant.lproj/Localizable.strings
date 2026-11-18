@@ -388,3 +388,10 @@
 "Redo" = "重做";
 "Cut" = "剪下";
 "Copy an item, then press ⌘V here." = "拷貝一個項目，然後在此處按 ⌘V。";
+"New snippet" = "新增片段";
+"Snippet text" = "片段文字";
+"Write your snippet…" = "編寫你的片段⋯";
+"Save snippet" = "儲存片段";
+"Snippet is too long." = "片段過長。";
+"Write a snippet or paste copied text." = "編寫片段或貼上拷貝的文字。";
+"Saved snippets stay pinned." = "儲存的片段會保持置頂。";

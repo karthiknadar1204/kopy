@@ -388,3 +388,10 @@
 "Redo" = "やり直す";
 "Cut" = "カット";
 "Copy an item, then press ⌘V here." = "項目をコピーして、ここで⌘Vを押してください。";
+"New snippet" = "新規スニペット";
+"Snippet text" = "スニペットのテキスト";
+"Write your snippet…" = "スニペットを入力…";
+"Save snippet" = "スニペットを保存";
+"Snippet is too long." = "スニペットが長すぎます。";
+"Write a snippet or paste copied text." = "スニペットを入力するか、コピーしたテキストをペーストしてください。";
+"Saved snippets stay pinned." = "保存したスニペットはピン留めされます。";

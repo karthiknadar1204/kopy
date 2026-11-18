@@ -388,3 +388,10 @@
 "Redo" = "ביצוע חוזר";
 "Cut" = "גזור";
 "Copy an item, then press ⌘V here." = "העתיקו פריט ולאחר מכן לחצו כאן על ⌘V.";
+"New snippet" = "קטע חדש";
+"Snippet text" = "טקסט הקטע";
+"Write your snippet…" = "כתבו את הקטע שלכם…";
+"Save snippet" = "שמירת קטע";
+"Snippet is too long." = "הקטע ארוך מדי.";
+"Write a snippet or paste copied text." = "כתבו קטע או הדביקו טקסט שהועתק.";
+"Saved snippets stay pinned." = "קטעים שנשמרו נשארים מוצמדים.";

@@ -388,3 +388,10 @@
 "Redo" = "Επανάληψη";
 "Cut" = "Αποκοπή";
 "Copy an item, then press ⌘V here." = "Αντιγράψτε ένα στοιχείο και πατήστε ⌘V εδώ.";
+"New snippet" = "Νέο απόσπασμα";
+"Snippet text" = "Κείμενο αποσπάσματος";
+"Write your snippet…" = "Γράψτε το απόσπασμά σας…";
+"Save snippet" = "Αποθήκευση αποσπάσματος";
+"Snippet is too long." = "Το απόσπασμα είναι πολύ μεγάλο.";
+"Write a snippet or paste copied text." = "Γράψτε ένα απόσπασμα ή επικολλήστε αντιγραμμένο κείμενο.";
+"Saved snippets stay pinned." = "Τα αποθηκευμένα αποσπάσματα παραμένουν καρφιτσωμένα.";

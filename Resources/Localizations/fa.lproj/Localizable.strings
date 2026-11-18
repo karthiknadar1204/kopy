@@ -388,3 +388,10 @@
 "Redo" = "انجام دوباره";
 "Cut" = "برش";
 "Copy an item, then press ⌘V here." = "یک مورد را کپی کنید، سپس اینجا ⌘V را فشار دهید.";
+"New snippet" = "قطعهٔ جدید";
+"Snippet text" = "متن قطعه";
+"Write your snippet…" = "قطعهٔ خود را بنویسید…";
+"Save snippet" = "ذخیرهٔ قطعه";
+"Snippet is too long." = "قطعه بیش از حد طولانی است.";
+"Write a snippet or paste copied text." = "یک قطعه بنویسید یا متن کپی‌شده را جای‌گذاری کنید.";
+"Saved snippets stay pinned." = "قطعه‌های ذخیره‌شده سنجاق‌شده می‌مانند.";

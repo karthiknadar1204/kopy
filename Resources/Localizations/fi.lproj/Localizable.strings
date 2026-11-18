@@ -388,3 +388,10 @@
 "Redo" = "Tee uudelleen";
 "Cut" = "Leikkaa";
 "Copy an item, then press ⌘V here." = "Kopioi kohde ja paina sitten tässä ⌘V.";
+"New snippet" = "Uusi tekstikatkelma";
+"Snippet text" = "Katkelman teksti";
+"Write your snippet…" = "Kirjoita katkelmasi…";
+"Save snippet" = "Tallenna katkelma";
+"Snippet is too long." = "Katkelma on liian pitkä.";
+"Write a snippet or paste copied text." = "Kirjoita katkelma tai sijoita kopioitu teksti.";
+"Saved snippets stay pinned." = "Tallennetut katkelmat pysyvät kiinnitettyinä.";

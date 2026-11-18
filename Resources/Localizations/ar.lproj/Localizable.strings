@@ -388,3 +388,10 @@
 "Redo" = "إعادة";
 "Cut" = "قص";
 "Copy an item, then press ⌘V here." = "انسخ عنصرًا، ثم اضغط على ⌘V هنا.";
+"New snippet" = "مقتطف جديد";
+"Snippet text" = "نص المقتطف";
+"Write your snippet…" = "اكتب مقتطفك…";
+"Save snippet" = "حفظ المقتطف";
+"Snippet is too long." = "المقتطف طويل جدًا.";
+"Write a snippet or paste copied text." = "اكتب مقتطفًا أو الصق نصًا منسوخًا.";
+"Saved snippets stay pinned." = "تبقى المقتطفات المحفوظة مثبتة.";

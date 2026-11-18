@@ -388,3 +388,10 @@
 "Redo" = "Rétablir";
 "Cut" = "Couper";
 "Copy an item, then press ⌘V here." = "Copiez un élément, puis appuyez sur ⌘V ici.";
+"New snippet" = "Nouvel extrait";
+"Snippet text" = "Texte de l’extrait";
+"Write your snippet…" = "Écrivez votre extrait…";
+"Save snippet" = "Enregistrer l’extrait";
+"Snippet is too long." = "L’extrait est trop long.";
+"Write a snippet or paste copied text." = "Écrivez un extrait ou collez du texte copié.";
+"Saved snippets stay pinned." = "Les extraits enregistrés restent épinglés.";

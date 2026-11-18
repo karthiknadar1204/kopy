@@ -392,3 +392,10 @@
 "Redo" = "Redo";
 "Cut" = "Cut";
 "Copy an item, then press ⌘V here." = "Copy an item, then press ⌘V here.";
+"New snippet" = "New snippet";
+"Snippet text" = "Snippet text";
+"Write your snippet…" = "Write your snippet…";
+"Save snippet" = "Save snippet";
+"Snippet is too long." = "Snippet is too long.";
+"Write a snippet or paste copied text." = "Write a snippet or paste copied text.";
+"Saved snippets stay pinned." = "Saved snippets stay pinned.";

@@ -388,3 +388,10 @@
 "Redo" = "फिर से करें";
 "Cut" = "काटें";
 "Copy an item, then press ⌘V here." = "कोई आइटम कॉपी करें, फिर यहाँ ⌘V दबाएँ।";
+"New snippet" = "नया स्निपेट";
+"Snippet text" = "स्निपेट का टेक्स्ट";
+"Write your snippet…" = "अपना स्निपेट लिखें…";
+"Save snippet" = "स्निपेट सहेजें";
+"Snippet is too long." = "स्निपेट बहुत लंबा है।";
+"Write a snippet or paste copied text." = "स्निपेट लिखें या कॉपी किया हुआ टेक्स्ट पेस्ट करें।";
+"Saved snippets stay pinned." = "सहेजे गए स्निपेट पिन किए रहते हैं।";

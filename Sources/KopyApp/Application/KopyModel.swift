@@ -19,6 +19,8 @@ final class KopyModel {
     private(set) var isLoadingHistory = false
     private(set) var isShelfOpen = false
     private(set) var noteDraft: NoteDraft?
+    private(set) var snippetDraft: String?
+    private(set) var isSavingSnippet = false
     private(set) var importRevision = 0
     private(set) var importFilter: ClipboardFilter = .all
     private(set) var expandedPinnedFilters: Set<String> = []
@@ -264,9 +266,46 @@ final class KopyModel {
     func importPayloads(_ payloads: [ClipboardPayload], showing filter: ClipboardFilter = .all) {
         guard !isDemo, !payloads.isEmpty else { return }
         let settings = preferences
-        mutate({ try await $0.importPayloads(payloads, preferences: settings) }) { [weak self] _ in
+        mutate({ try await $0.importPayloads(payloads, preferences: settings) }, onSuccess: { [weak self] _ in
             self?.importFilter = filter
             self?.importRevision &+= 1
+        })
+    }
+
+    var canSaveSnippet: Bool {
+        guard let snippetDraft, !isSavingSnippet else { return false }
+        return snippetDraft.count <= 500_000 && !snippetDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    func beginSnippet() {
+        if snippetDraft == nil { snippetDraft = "" }
+    }
+
+    func updateSnippetDraft(_ text: String) {
+        guard snippetDraft != nil, !isSavingSnippet else { return }
+        snippetDraft = text
+    }
+
+    func cancelSnippet() {
+        guard !isSavingSnippet else { return }
+        snippetDraft = nil
+    }
+
+    func saveSnippet() {
+        guard canSaveSnippet, let snippetDraft else { return }
+        let payload = ClipboardPayload.text(ClipboardText(snippetDraft))
+        let settings = preferences
+        isSavingSnippet = true
+        mutate({ try await $0.saveSnippet(snippetDraft, preferences: settings) }, onFailure: { [weak self] in
+            self?.isSavingSnippet = false
+        }) { [weak self] _ in
+            guard let self else { return }
+            self.snippetDraft = nil
+            isSavingSnippet = false
+            importFilter = ClipboardItem(payload: payload).category
+            expandedPinnedFilters.insert(importFilter.rawValue)
+            defaults.set(Array(expandedPinnedFilters), forKey: "expandedPinnedFilters")
+            importRevision &+= 1
         }
     }
 
@@ -337,9 +376,9 @@ final class KopyModel {
     }
 
     func pin(_ item: ClipboardItem) {
-        mutate({ try await $0.setPinned(!item.pinned, for: item.id) }) { [weak self] _ in
+        mutate({ try await $0.setPinned(!item.pinned, for: item.id) }, onSuccess: { [weak self] _ in
             self?.play(item.pinned ? .off : .on)
-        }
+        })
     }
 
     func editNote(_ item: ClipboardItem) {
@@ -375,19 +414,19 @@ final class KopyModel {
     }
 
     func delete(_ item: ClipboardItem) {
-        mutate({ try await $0.delete(item.id) }) { [weak self] _ in
+        mutate({ try await $0.delete(item.id) }, onSuccess: { [weak self] _ in
             self?.clearOwnedClipboard(in: [item.id])
             self?.play(.delete)
-        }
+        })
     }
 
     func clear(_ items: [ClipboardItem], since: Date? = nil) {
         let ids = Set(items.filter { item in
             !item.isProtected && (since.map { item.activityAt >= $0 } ?? true)
         }.map(\.id))
-        mutate({ try await $0.clear(ids, since: since) }) { [weak self] remaining in
+        mutate({ try await $0.clear(ids, since: since) }, onSuccess: { [weak self] remaining in
             self?.clearOwnedClipboard(in: ids.subtracting(remaining.map(\.id)))
-        }
+        })
     }
 
     private func clearOwnedClipboard(in ids: Set<UUID>) {
@@ -519,9 +558,10 @@ final class KopyModel {
 
     private func mutate(
         _ action: @escaping @Sendable (HistoryStore) async throws -> [ClipboardItem],
+        onFailure: (() -> Void)? = nil,
         onSuccess: (([ClipboardItem]) -> Void)? = nil
     ) {
-        guard !isDemo, history != nil || isLoadingHistory else { return }
+        guard !isDemo, history != nil || isLoadingHistory else { onFailure?(); return }
         let previous = mutation
         mutation = Task { @MainActor [weak self] in
             await previous?.value
@@ -531,6 +571,7 @@ final class KopyModel {
                 self?.items = updated
                 onSuccess?(updated)
             } catch {
+                onFailure?()
                 self?.inform(error)
             }
         }

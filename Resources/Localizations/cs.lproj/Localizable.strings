@@ -388,3 +388,10 @@
 "Redo" = "Znovu";
 "Cut" = "Vyjmout";
 "Copy an item, then press ⌘V here." = "Zkopírujte položku a potom zde stiskněte ⌘V.";
+"New snippet" = "Nový úryvek";
+"Snippet text" = "Text úryvku";
+"Write your snippet…" = "Napište úryvek…";
+"Save snippet" = "Uložit úryvek";
+"Snippet is too long." = "Úryvek je příliš dlouhý.";
+"Write a snippet or paste copied text." = "Napište úryvek nebo vložte zkopírovaný text.";
+"Saved snippets stay pinned." = "Uložené úryvky zůstávají připnuté.";

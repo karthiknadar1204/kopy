@@ -388,3 +388,10 @@
 "Redo" = "Wiederholen";
 "Cut" = "Ausschneiden";
 "Copy an item, then press ⌘V here." = "Kopiere ein Objekt und drücke hier ⌘V.";
+"New snippet" = "Neuer Textbaustein";
+"Snippet text" = "Text des Bausteins";
+"Write your snippet…" = "Schreibe deinen Textbaustein…";
+"Save snippet" = "Textbaustein sichern";
+"Snippet is too long." = "Der Textbaustein ist zu lang.";
+"Write a snippet or paste copied text." = "Schreibe einen Textbaustein oder füge kopierten Text ein.";
+"Saved snippets stay pinned." = "Gesicherte Textbausteine bleiben angeheftet.";

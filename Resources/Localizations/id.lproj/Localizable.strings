@@ -388,3 +388,10 @@
 "Redo" = "Ulangi";
 "Cut" = "Potong";
 "Copy an item, then press ⌘V here." = "Salin item, lalu tekan ⌘V di sini.";
+"New snippet" = "Cuplikan baru";
+"Snippet text" = "Teks cuplikan";
+"Write your snippet…" = "Tulis cuplikan Anda…";
+"Save snippet" = "Simpan cuplikan";
+"Snippet is too long." = "Cuplikan terlalu panjang.";
+"Write a snippet or paste copied text." = "Tulis cuplikan atau tempel teks yang disalin.";
+"Saved snippets stay pinned." = "Cuplikan tersimpan tetap disematkan.";
