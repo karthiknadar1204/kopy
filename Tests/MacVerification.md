@@ -63,3 +63,17 @@ The Store tour previously described automatic cross-app paste. Its collect and p
 The native drag tool returned `noWindowsAvailable` even in a Finder-only control test, so its drag attempts do not establish a Kopy failure or a pass. During the automatic-paste check, macOS still reported event-posting access denied despite an enabled permission entry. No permission check was bypassed. Both Kopy permission switches were off at cleanup.
 
 These checks do not establish App Store approval or replace testing the final distribution-signed build.
+
+## App-switch and drag follow-up
+
+The user reported completing most manual checks, with launch after login still untested. Two failures remained: Escape did not cancel a drag, and the small gray edge handle disappeared after browser switches.
+
+The input regression reproduced the shelf accepting keyboard focus during an incoming drag. The model now releases its keyboard focus when a drag enters and rejects new keyboard-focus requests until the drag leaves or ends.
+
+The edge-window regression caught the handle and sensor using `moveToActiveSpace`. Both now use `canJoinAllSpaces`. The shelf panel retains `moveToActiveSpace` and its existing auto-hide behavior. App activation refreshes the edge windows, and that refresh restores handle ordering even when its drawing has not changed.
+
+All 79 tests passed after these changes. The direct release bundle and sandbox preview both built successfully.
+
+The user physically dragged a promised file to the shelf, pressed Escape while holding the drag, and released the mouse. They confirmed cancellation without an added item. The source recorded drag operation `0` and never received a file-write request. A read of the isolated profile's persisted history also confirmed that the uniquely named canceled file was absent.
+
+The handle remained discoverable as a native window after Chrome and Safari app switches during the live session. Confirmation of its visible appearance across the user's browser windows is pending. Launch after a fresh macOS login remains untested.

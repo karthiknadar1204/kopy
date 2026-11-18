@@ -155,6 +155,11 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.shelf.spaceChanged() }
         })
+        workspaceObservers.append(workspace.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.shelf.refreshDisplays() }
+        })
         appObservers.append(NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in

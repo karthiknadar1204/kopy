@@ -45,6 +45,7 @@ final class ShelfBeacon {
     var isVisible: Bool { panel.isVisible }
 
     init() {
+        panel.title = "Kopy Edge Handle"
         panel.level = .floating
         panel.ignoresMouseEvents = true
         panel.contentView = content
@@ -57,14 +58,18 @@ final class ShelfBeacon {
     }
 
     func setCollectionBehavior(_ behavior: NSWindow.CollectionBehavior) {
-        panel.collectionBehavior = behavior
+        if panel.collectionBehavior != behavior { panel.collectionBehavior = behavior }
     }
 
-    func show(_ cue: Cue, at trigger: CGRect, in geometry: ShelfGeometry, animated: Bool) {
+    func show(_ cue: Cue, at trigger: CGRect, in geometry: ShelfGeometry, animated: Bool,
+              restoreVisibility: Bool = false) {
         let isTop = geometry.edge == .top
         let thickness = isTop ? trigger.height : trigger.width
         let canvas = geometry.approach(trigger, depth: thickness + 32, margin: 21).intersection(geometry.workArea)
-        guard panel.frame != canvas || lastCue != cue || !panel.isVisible else { return }
+        guard panel.frame != canvas || lastCue != cue || !panel.isVisible else {
+            if restoreVisibility { panel.orderFrontRegardless() }
+            return
+        }
         let oldPath = panel.frame == canvas && panel.isVisible ? (shape.presentation()?.path ?? shape.path) : nil
         panel.setFrame(canvas, display: true)
 
@@ -102,7 +107,7 @@ final class ShelfBeacon {
         glyph.frame = CGRect(x: iconCenter.x - 8, y: iconCenter.y - 8, width: 16, height: 16)
         glyph.image = cue.symbol.flatMap { NSImage(systemSymbolName: $0, accessibilityDescription: nil) }
         glyph.isHidden = glyph.image == nil
-        if !panel.isVisible { panel.orderFrontRegardless() }
+        if restoreVisibility || !panel.isVisible { panel.orderFrontRegardless() }
         lastCue = cue
     }
 

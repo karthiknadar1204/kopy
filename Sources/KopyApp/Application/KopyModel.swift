@@ -30,7 +30,11 @@ final class KopyModel {
     private(set) var importFilter: ClipboardFilter = .all
     private(set) var importFocusID: UUID?
     private(set) var expandedPinnedFilters: Set<String> = []
-    var isDropTargeted = false
+    var isDropTargeted = false {
+        didSet {
+            if isDropTargeted { setKeyboardEntry(false) }
+        }
+    }
     var message: String?
     let isDemo: Bool
 #if !KOPY_APP_STORE
@@ -224,6 +228,7 @@ final class KopyModel {
     }
 
     func setKeyboardEntry(_ enabled: Bool) {
+        guard !enabled || !isDropTargeted else { return }
         if enabled { borrowedFocus = true }
         keyboardEntryChanged?(enabled)
     }

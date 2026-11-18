@@ -55,6 +55,7 @@ final class EdgeShelfWindow {
             hosting.bottomAnchor.constraint(equalTo: bodyView.bottomAnchor)
         ])
 
+        sensor.title = "Kopy Edge Sensor"
         sensor.level = NSWindow.Level(rawValue: NSWindow.Level.floating.rawValue + 1)
         sensor.contentView = sensorView
         sensor.ignoresMouseEvents = true
@@ -190,10 +191,13 @@ final class EdgeShelfWindow {
             : [.moveToActiveSpace, .ignoresCycle, .fullScreenAuxiliary]
         if shelf.collectionBehavior != behavior {
             shelf.collectionBehavior = behavior
-            sensor.collectionBehavior = behavior
             notice.collectionBehavior = behavior
-            beacon.setCollectionBehavior(behavior)
         }
+        let edgeBehavior: NSWindow.CollectionBehavior = preferences.suppressFullscreen
+            ? [.canJoinAllSpaces, .ignoresCycle, .fullScreenNone]
+            : [.canJoinAllSpaces, .ignoresCycle, .fullScreenAuxiliary]
+        if sensor.collectionBehavior != edgeBehavior { sensor.collectionBehavior = edgeBehavior }
+        beacon.setCollectionBehavior(edgeBehavior)
         guard !shouldAvoidFullscreen() else {
             hideForCurrentSpace()
             return
@@ -206,7 +210,8 @@ final class EdgeShelfWindow {
         if isOpen {
             orderShelfForCurrentDrag(using: geometry)
         }
-        refreshBeacon()
+        if !isOpen, sensor.isVisible { sensor.orderFrontRegardless() }
+        refreshBeacon(restoreVisibility: true)
     }
 
     func spaceChanged() {
@@ -542,13 +547,14 @@ final class EdgeShelfWindow {
         }
     }
 
-    private func refreshBeacon() {
+    private func refreshBeacon(restoreVisibility: Bool = false) {
         guard isRunning, !isOpen, panelMotion == nil, !isSuspended, let geometry,
               !shouldAvoidFullscreen() else {
             beacon.hide()
             return
         }
-        beacon.show(currentCue, at: geometry.trigger(preferences), in: geometry, animated: !reduceMotion)
+        beacon.show(currentCue, at: geometry.trigger(preferences), in: geometry, animated: !reduceMotion,
+                    restoreVisibility: restoreVisibility)
     }
 
     private func observeMenuTracking() {
