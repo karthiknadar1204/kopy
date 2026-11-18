@@ -1,6 +1,6 @@
 # Mac App Store readiness
 
-Reviewed November 17, 2026.
+Reviewed November 18, 2026.
 
 ## Implemented and checked
 
@@ -18,7 +18,9 @@ Reviewed November 17, 2026.
 | Privacy manifest | The store bundle includes Store/PrivacyInfo.xcprivacy. The reference repository's manifest validation completed successfully. |
 | Listing | The reference repository's metadata audit, including URL checks, reported zero findings for Store/metadata. |
 | Screenshots | Four fixture screenshots in Store/screenshots/en-US are 2560 by 1600 pixels. They use the actual SwiftUI views with store build conditions. |
-| Local test suite | All 53 tests passed. The tests include encrypted history, clipboard transfers, localization completeness, and legacy file record compatibility. |
+| Local test suite | All 54 tests passed on macOS 27.2.1. The tests include encrypted history, clipboard transfers, localization completeness, legacy file record compatibility, and domain display across Unicode, percent-encoded, and punycode URLs. |
+| Updated macOS | The sandbox preview launched and opened Settings on macOS 27.2.1. The scoped-file probe successfully read its fixture before and after relaunch. |
+| GitHub verification | Commit 7310f58 passed tests, the Xcode store archive, and the archive inspection. [Build results](https://github.com/karthiknadar1204/kopy/actions/runs/44240070726). |
 | Languages | All 31 selectable languages contain the new privacy and copy-action labels. |
 | Account features | Kopy has no user accounts, social login, subscriptions, in-app payments, AI integration, advertising, or analytics SDK. |
 
@@ -30,7 +32,6 @@ The support and privacy contact uses karthiknadar1204@gmail.com, the repository 
 | --- | --- |
 | Distribution signing | This Mac has Command Line Tools and no valid signing identities. The local preview is ad hoc signed. Add Xcode and the Apple developer team, then create and validate the distribution-signed archive. |
 | App Store Connect | App record, bundle registration, age-rating answers, App Privacy answers, review contact, encryption declaration, price, availability, agreements, and trader status require verification in the developer account. |
-| Current shipping macOS | The live sandbox checks ran on macOS 15.5. Repeat the release tests on the current shipping macOS before submission. |
 | Final distribution build | Repeat Finder drops, drag-out to a sandboxed destination, managed images and stack selection, restart, sleep/wake, full-screen behavior, physical shortcut input, and multiple displays on the signed release. |
 | Review outcome | Apple has not reviewed or approved this build. |
 
