@@ -30,6 +30,8 @@ Kopy creates readable temporary files when another app needs a file or image thr
 
 Deletion removes an item from Kopy's active history. Kopy does not promise forensic erasure from backups, storage snapshots, or storage media. macOS backups may contain local app data. Removing Kopy does not delete files you exported or copied elsewhere.
 
+Kopy keeps the last 20 manual delete or clear actions in memory for Undo during the current app session. Quitting Kopy discards this recovery history. Undo does not use a separate recovery database or upload deleted content.
+
 ## Permissions and choices
 
 Automatic clipboard reading follows your macOS clipboard permission. The direct build offers click-to-paste and asks for event-posting access through macOS when you select Allow automatic paste. Without that access, Kopy leaves the item ready for manual paste. The Mac App Store build copies a selected item to the clipboard. Press Command-V in the destination app to paste it. The store build does not request Accessibility access.

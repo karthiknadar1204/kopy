@@ -401,3 +401,8 @@
 "Show all time" = "Zobrazit vše";
 "Show history" = "Zobrazit historii";
 "Another item already has this text. Edit that item or change the text." = "Jiná položka už tento text obsahuje. Upravte ji nebo změňte text.";
+"Undo delete" = "Odvolat smazání";
+"Undo clear history" = "Odvolat vymazání historie";
+"Item deleted" = "Položka smazána";
+"History cleared" = "Historie vymazána";
+"A newer copy has a different note. Undo is still available." = "Novější kopie má jinou poznámku. Zpět je stále k dispozici.";

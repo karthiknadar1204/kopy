@@ -401,3 +401,8 @@
 "Show all time" = "顯示全部時間";
 "Show history" = "顯示歷史記錄";
 "Another item already has this text. Edit that item or change the text." = "其他項目已有此文字。請編輯該項目或更改文字。";
+"Undo delete" = "還原刪除";
+"Undo clear history" = "還原清除歷史記錄";
+"Item deleted" = "項目已刪除";
+"History cleared" = "歷史記錄已清除";
+"A newer copy has a different note. Undo is still available." = "較新的副本有不同的備註。仍可還原。";

@@ -401,3 +401,8 @@
 "Show all time" = "Pokaż cały okres";
 "Show history" = "Pokaż historię";
 "Another item already has this text. Edit that item or change the text." = "Inna rzecz zawiera już ten tekst. Edytuj ją lub zmień tekst.";
+"Undo delete" = "Cofnij usunięcie";
+"Undo clear history" = "Cofnij wyczyszczenie historii";
+"Item deleted" = "Rzecz usunięta";
+"History cleared" = "Historia wyczyszczona";
+"A newer copy has a different note. Undo is still available." = "Nowsza kopia ma inną notatkę. Cofnięcie jest nadal dostępne.";

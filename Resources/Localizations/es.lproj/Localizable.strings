@@ -401,3 +401,8 @@
 "Show all time" = "Mostrar todo el tiempo";
 "Show history" = "Mostrar historial";
 "Another item already has this text. Edit that item or change the text." = "Otro elemento ya contiene este texto. Edita ese elemento o cambia el texto.";
+"Undo delete" = "Deshacer eliminación";
+"Undo clear history" = "Deshacer borrado del historial";
+"Item deleted" = "Elemento eliminado";
+"History cleared" = "Historial borrado";
+"A newer copy has a different note. Undo is still available." = "Una copia más reciente tiene otra nota. Aún puedes deshacer.";

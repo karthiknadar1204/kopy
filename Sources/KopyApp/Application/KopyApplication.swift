@@ -115,7 +115,10 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         model.keyboardEntryChanged = { [weak self] enabled in self?.shelf.setKeyboardEntry(enabled) }
         shelf.onOpen = { [weak self] in self?.model.recordTarget() }
         shelf.onClose = { [weak self] in self?.model.shelfClosed() }
-        shelf.shouldStayOpen = { [weak self] in self?.model.snippetDraft != nil }
+        shelf.shouldStayOpen = { [weak self] in
+            guard let self else { return false }
+            return model.snippetDraft != nil || model.historyActionsOpen || model.clearConfirmationOpen
+        }
         shelf.onDragChange = { [weak self] targeted in self?.model.isDropTargeted = targeted }
         shelf.onDrop = { [weak self] board in
             guard let self, !model.isDemo else { return false }

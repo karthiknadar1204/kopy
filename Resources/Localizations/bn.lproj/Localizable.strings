@@ -401,3 +401,8 @@
 "Show all time" = "সব সময়ের দেখান";
 "Show history" = "ইতিহাস দেখান";
 "Another item already has this text. Edit that item or change the text." = "অন্য একটি আইটেমে এই লেখা আছে। সেই আইটেম সম্পাদনা করুন বা লেখা বদলান।";
+"Undo delete" = "মুছে ফেলা পূর্বাবস্থায় ফেরান";
+"Undo clear history" = "ইতিহাস মোছা পূর্বাবস্থায় ফেরান";
+"Item deleted" = "আইটেম মুছে ফেলা হয়েছে";
+"History cleared" = "ইতিহাস মুছে ফেলা হয়েছে";
+"A newer copy has a different note. Undo is still available." = "নতুন কপিতে আলাদা নোট আছে। এখনও পূর্বাবস্থায় ফেরানো যাবে।";

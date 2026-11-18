@@ -315,6 +315,115 @@ struct HistoryTests {
     }
 }
 
+extension HistoryTests {
+    @Test("Undo restores deleted content, metadata, IDs, and original order")
+    func undoDeletionRestoresItem() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let seeded = try await store.importPayloads([
+            .text(.init("Undo text fixture")), .image(try pngFixture(12)), .files([testFile(7)])
+        ], preferences: .init())
+        _ = try await store.setPinned(true, for: seeded[0].id)
+        let before = try await store.setNote("Retain fixture note", for: seeded[0].id)
+        for item in before {
+            let after = try await store.delete(item.id, undoable: true)
+            #expect(after.count == before.count - 1)
+            #expect(await store.undoState?.action == .delete)
+            #expect(try await store.undoDeletion() == before)
+            #expect(await store.undoState == nil)
+        }
+        let reopened = try fixture.open()
+        #expect(await reopened.snapshot() == before)
+        #expect(await reopened.undoState == nil)
+    }
+
+    @Test("Undo clear restores only removed items and keeps copies made afterward")
+    func undoClearPreservesNewCopies() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let seeded = try await store.importPayloads((0..<4).map { .text(.init("Clear fixture \($0)")) }, preferences: .init())
+        _ = try await store.setPinned(true, for: seeded[0].id)
+        let before = try await store.setNote("Keep note", for: seeded[1].id)
+        let cleared = try await store.clear(Set(before.map(\.id)), undoable: true)
+        #expect(Set(cleared.map(\.id)) == Set(before.prefix(2).map(\.id)))
+        let state = await store.undoState
+        #expect(state?.action == .clear)
+        _ = try await store.clear([], undoable: true)
+        #expect(await store.undoState == state)
+        let copied = try await store.capture(.text(.init("Copy made after clearing")), preferences: .init())
+        let newest = try #require(copied.first)
+        let restored = try await store.undoDeletion()
+        #expect(restored.first == newest)
+        #expect(Array(restored.dropFirst()) == before)
+        #expect(await store.undoState == nil)
+    }
+
+    @Test("A copied-again item is merged on Undo without duplication or lost protection")
+    func undoMergesRecopiedItem() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let initial = try await store.capture(.text(.init("Copied again fixture")), preferences: .init())
+        let id = try #require(initial.first?.id)
+        _ = try await store.setPinned(true, for: id)
+        _ = try await store.setNote("Original note", for: id)
+        _ = try await store.delete(id, undoable: true)
+        let copied = try await store.capture(.text(.init("Copied again fixture")), preferences: .init())
+        let copyID = try #require(copied.first?.id)
+        let restored = try await store.undoDeletion()
+        #expect(restored.count == 1)
+        #expect(restored.first?.id == copyID)
+        #expect(restored.first?.note == "Original note")
+        #expect(restored.first?.pinned == true)
+        #expect(restored.first?.copyCount == 2)
+    }
+
+    @Test("Conflicting notes and failed commits retain the available Undo")
+    func failedUndoRetainsRecovery() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let first = try await store.capture(.text(.init("Conflict fixture")), preferences: .init())
+        let id = try #require(first.first?.id)
+        _ = try await store.setNote("Previous note", for: id)
+        _ = try await store.delete(id, undoable: true)
+        let copied = try await store.capture(.text(.init("Conflict fixture")), preferences: .init())
+        let copyID = try #require(copied.first?.id)
+        let before = try await store.setNote("Newer note", for: copyID)
+        let undo = await store.undoState
+        await #expect(throws: HistoryError.undoConflict) { _ = try await store.undoDeletion() }
+        #expect(await store.snapshot() == before)
+        #expect(await store.undoState == undo)
+        _ = try await store.setNote(nil, for: copyID)
+        try fixture.sql("CREATE TRIGGER undo_failure BEFORE UPDATE ON state BEGIN SELECT RAISE(ABORT, 'fixture'); END;")
+        await #expect(throws: HistoryError.unreadable) { _ = try await store.undoDeletion() }
+        #expect(await store.undoState == undo)
+        try fixture.sql("DROP TRIGGER undo_failure")
+        let restored = try await store.undoDeletion()
+        #expect(restored.first?.note == "Previous note")
+        #expect(await store.undoState == nil)
+    }
+
+    @Test("Undo keeps the last twenty actions and never creates a restart recovery journal")
+    func boundedSessionUndo() async throws {
+        let fixture = try HistoryFixture()
+        defer { fixture.remove() }
+        let store = try fixture.open()
+        let before = try await store.importPayloads((0..<21).map { .text(.init("Undo limit fixture \($0)")) }, preferences: .init())
+        for item in before { _ = try await store.delete(item.id, undoable: true) }
+        let reopened = try fixture.open()
+        #expect(await reopened.undoState == nil)
+        #expect(await reopened.snapshot().isEmpty)
+        for _ in 0..<20 { _ = try await store.undoDeletion() }
+        let restored = await store.snapshot()
+        #expect(Set(restored.map(\.id)) == Set(before.dropFirst().map(\.id)))
+        #expect(await store.undoState == nil)
+        #expect(try await store.undoDeletion() == restored)
+    }
+}
+
 private struct HistoryFixture {
     let url: URL
     let key = SymmetricKey(size: .bits256)

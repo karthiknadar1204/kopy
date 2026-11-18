@@ -13,7 +13,6 @@ struct ShelfView: View {
     @State private var previewID: UUID?
     @State private var expandedStackID: UUID?
     @State private var emojiOpen = false
-    @State private var confirmClear = false
     @State private var scrollID: UUID?
     @State private var scrollAnchor: UnitPoint?
     @State private var scrollMarks = ShelfScrollMarks()
@@ -68,6 +67,10 @@ struct ShelfView: View {
                     .focusEffectDisabled()
                     .focused($focus, equals: .history)
                     .onCommand(#selector(NSText.paste(_:))) { model.pasteClipboard(into: filter) }
+                    .onCommand(Selector(("undo:")), perform: model.undoDeletion)
+            }
+            if let action = model.undoAction {
+                ShelfUndoBar(action: action, isUndoing: model.isUndoingDeletion, undo: model.undoDeletion)
             }
             if let message = model.message {
                 Text(message)
@@ -110,6 +113,9 @@ struct ShelfView: View {
         .onChange(of: model.snippetDraft != nil) { _, composing in
             if !composing, model.isShelfOpen { focusHistory() }
         }
+        .onChange(of: model.undoState) { _, _ in
+            if model.isShelfOpen, model.snippetDraft == nil, model.noteDraft == nil { focusHistory() }
+        }
         .onChange(of: model.importRevision) { _, _ in
             guard model.snippetDraft == nil else { return }
             scrollAnchor = nil
@@ -119,7 +125,7 @@ struct ShelfView: View {
             filter = model.importFilter
             expandedStackID = nil
             filterPositions[filter] = nil
-            scrollID = model.items.first?.id
+            scrollID = model.importFocusID ?? model.items.first?.id
             focusHistory()
         }
         .onChange(of: filter) { _, next in
@@ -353,29 +359,11 @@ struct ShelfView: View {
     }
 
     private func historyMenu(_ matches: [ClipboardItem]) -> some View {
-        Menu {
-            Picker("Show history", selection: $timeRange) {
-                ForEach(ClipboardTimeRange.allCases) { range in
-                    Text(LocalizedStringKey(range.title)).tag(range)
-                }
-            }
-            .pickerStyle(.inline)
-            Divider()
-            Button("Clear shown history", systemImage: "trash", role: .destructive) { confirmClear = true }
-                .disabled(!matches.contains { !$0.isProtected })
-        } label: {
-            Image(systemName: "ellipsis")
-                .frame(width: 26, height: 26)
-                .accessibilityLabel("History actions")
+        @Bindable var model = model
+        return ShelfHistoryControls(model: model, timeRange: $timeRange, canClear: matches.contains { !$0.isProtected }) {
+            model.clearConfirmationOpen = true
         }
-        .menuStyle(.borderlessButton)
-        .labelStyle(.titleAndIcon)
-        .menuOrder(.fixed)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .foregroundStyle(ShelfTheme.muted)
-        .help("History actions")
-        .confirmationDialog("Clear shown history?", isPresented: $confirmClear) {
+        .confirmationDialog("Clear shown history?", isPresented: $model.clearConfirmationOpen) {
             Button("Clear history", role: .destructive) { model.clear(matchingItems) }
         } message: {
             Text("Pinned items and items with notes will be kept.")

@@ -21,8 +21,14 @@ final class KopyModel {
     private(set) var noteDraft: NoteDraft?
     private(set) var snippetDraft: SnippetDraft?
     private(set) var isSavingSnippet = false
+    private(set) var undoState: HistoryUndoState?
+    var undoAction: HistoryUndoAction? { undoState?.action }
+    private(set) var isUndoingDeletion = false
+    var historyActionsOpen = false
+    var clearConfirmationOpen = false
     private(set) var importRevision = 0
     private(set) var importFilter: ClipboardFilter = .all
+    private(set) var importFocusID: UUID?
     private(set) var expandedPinnedFilters: Set<String> = []
     var isDropTargeted = false
     var message: String?
@@ -170,6 +176,8 @@ final class KopyModel {
     }
 
     func shelfClosed() {
+        historyActionsOpen = false
+        clearConfirmationOpen = false
         finishNote(saving: true)
         isShelfOpen = false
     }
@@ -266,8 +274,9 @@ final class KopyModel {
     func importPayloads(_ payloads: [ClipboardPayload], showing filter: ClipboardFilter = .all) {
         guard !isDemo, !payloads.isEmpty else { return }
         let settings = preferences
-        mutate({ try await $0.importPayloads(payloads, preferences: settings) }, onSuccess: { [weak self] _ in
+        mutate({ try await $0.importPayloads(payloads, preferences: settings) }, onSuccess: { [weak self] updated in
             self?.importFilter = filter
+            self?.importFocusID = updated.first?.id
             self?.importRevision &+= 1
         })
     }
@@ -304,11 +313,12 @@ final class KopyModel {
         isSavingSnippet = true
         mutate({ try await $0.saveSnippet(snippetDraft.text, replacing: snippetDraft.itemID, preferences: settings) }, onFailure: { [weak self] in
             self?.isSavingSnippet = false
-        }) { [weak self] _ in
+        }) { [weak self] updated in
             guard let self else { return }
             self.snippetDraft = nil
             isSavingSnippet = false
             importFilter = ClipboardItem(payload: payload).category
+            importFocusID = updated.first?.id
             expandedPinnedFilters.insert(importFilter.rawValue)
             defaults.set(Array(expandedPinnedFilters), forKey: "expandedPinnedFilters")
             importRevision &+= 1
@@ -420,9 +430,10 @@ final class KopyModel {
     }
 
     func delete(_ item: ClipboardItem) {
-        mutate({ try await $0.delete(item.id) }, onSuccess: { [weak self] _ in
+        mutate({ try await $0.delete(item.id, undoable: true) }, onSuccess: { [weak self] _ in
             self?.clearOwnedClipboard(in: [item.id])
             self?.play(.delete)
+            self?.keepShelfOpen?(.seconds(5))
         })
     }
 
@@ -430,9 +441,27 @@ final class KopyModel {
         let ids = Set(items.filter { item in
             !item.isProtected && (since.map { item.activityAt >= $0 } ?? true)
         }.map(\.id))
-        mutate({ try await $0.clear(ids, since: since) }, onSuccess: { [weak self] remaining in
+        mutate({ try await $0.clear(ids, since: since, undoable: true) }, onSuccess: { [weak self] remaining in
             self?.clearOwnedClipboard(in: ids.subtracting(remaining.map(\.id)))
+            self?.keepShelfOpen?(.seconds(5))
         })
+    }
+
+    func undoDeletion() {
+        guard undoAction != nil, !isUndoingDeletion else { return }
+        let currentIDs = Set(items.map(\.id))
+        isUndoingDeletion = true
+        mutate({ try await $0.undoDeletion() }, onFailure: { [weak self] in
+            self?.isUndoingDeletion = false
+        }) { [weak self] updated in
+            guard let self else { return }
+            isUndoingDeletion = false
+            importFilter = .all
+            importFocusID = updated.first(where: { !currentIDs.contains($0.id) })?.id ?? updated.first?.id
+            expandedPinnedFilters.insert(ClipboardFilter.all.rawValue)
+            importRevision &+= 1
+            keepShelfOpen?(.seconds(5))
+        }
     }
 
     private func clearOwnedClipboard(in ids: Set<UUID>) {
@@ -574,7 +603,9 @@ final class KopyModel {
             guard let history = self?.history else { return }
             do {
                 let updated = try await action(history)
+                let undoState = await history.undoState
                 self?.items = updated
+                self?.undoState = undoState
                 onSuccess?(updated)
             } catch {
                 onFailure?()

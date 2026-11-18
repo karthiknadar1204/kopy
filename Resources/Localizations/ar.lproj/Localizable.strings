@@ -401,3 +401,8 @@
 "Show all time" = "عرض كل الأوقات";
 "Show history" = "عرض السجل";
 "Another item already has this text. Edit that item or change the text." = "يوجد عنصر آخر بهذا النص. عدّل ذلك العنصر أو غيّر النص.";
+"Undo delete" = "التراجع عن الحذف";
+"Undo clear history" = "التراجع عن مسح السجل";
+"Item deleted" = "تم حذف العنصر";
+"History cleared" = "تم مسح السجل";
+"A newer copy has a different note. Undo is still available." = "تحتوي نسخة أحدث على ملاحظة مختلفة. لا يزال التراجع متاحًا.";

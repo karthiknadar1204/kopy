@@ -405,3 +405,8 @@
 "Show all time" = "Show all time";
 "Show history" = "Show history";
 "Another item already has this text. Edit that item or change the text." = "Another item already has this text. Edit that item or change the text.";
+"Undo delete" = "Undo delete";
+"Undo clear history" = "Undo clear history";
+"Item deleted" = "Item deleted";
+"History cleared" = "History cleared";
+"A newer copy has a different note. Undo is still available." = "A newer copy has a different note. Undo is still available.";

@@ -401,3 +401,8 @@
 "Show all time" = "Afficher toute la période";
 "Show history" = "Afficher l’historique";
 "Another item already has this text. Edit that item or change the text." = "Un autre élément contient déjà ce texte. Modifiez cet élément ou changez le texte.";
+"Undo delete" = "Annuler la suppression";
+"Undo clear history" = "Annuler l’effacement";
+"Item deleted" = "Élément supprimé";
+"History cleared" = "Historique effacé";
+"A newer copy has a different note. Undo is still available." = "Une copie plus récente a une note différente. L’annulation reste disponible.";

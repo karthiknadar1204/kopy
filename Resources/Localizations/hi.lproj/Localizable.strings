@@ -401,3 +401,8 @@
 "Show all time" = "सभी समय दिखाएँ";
 "Show history" = "इतिहास दिखाएँ";
 "Another item already has this text. Edit that item or change the text." = "किसी अन्य आइटम में यह टेक्स्ट पहले से है। उसे संपादित करें या टेक्स्ट बदलें।";
+"Undo delete" = "हटाना पूर्ववत करें";
+"Undo clear history" = "इतिहास साफ़ करना पूर्ववत करें";
+"Item deleted" = "आइटम हटाया गया";
+"History cleared" = "इतिहास साफ़ किया गया";
+"A newer copy has a different note. Undo is still available." = "नई कॉपी में अलग नोट है। पूर्ववत करना अभी भी उपलब्ध है।";

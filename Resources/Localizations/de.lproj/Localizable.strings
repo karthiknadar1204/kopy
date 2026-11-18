@@ -401,3 +401,8 @@
 "Show all time" = "Gesamten Zeitraum zeigen";
 "Show history" = "Verlauf anzeigen";
 "Another item already has this text. Edit that item or change the text." = "Ein anderes Objekt enthält bereits diesen Text. Bearbeite dieses Objekt oder ändere den Text.";
+"Undo delete" = "Löschen widerrufen";
+"Undo clear history" = "Verlaufslöschung widerrufen";
+"Item deleted" = "Objekt gelöscht";
+"History cleared" = "Verlauf gelöscht";
+"A newer copy has a different note. Undo is still available." = "Eine neuere Kopie hat eine andere Notiz. Widerrufen ist weiterhin verfügbar.";

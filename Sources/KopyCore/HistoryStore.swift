@@ -9,6 +9,7 @@ public enum HistoryError: LocalizedError, Equatable {
     case incompatibleStack
     case stackFull
     case duplicateSnippet
+    case undoConflict
 
     public var errorDescription: String? {
         switch self {
@@ -19,6 +20,7 @@ public enum HistoryError: LocalizedError, Equatable {
         case .incompatibleStack: "Only files and images can be combined."
         case .stackFull: "A stack can contain up to 10 items."
         case .duplicateSnippet: "Another item already has this text. Edit that item or change the text."
+        case .undoConflict: "A newer copy has a different note. Undo is still available."
         }
     }
 }
@@ -30,6 +32,11 @@ public actor HistoryStore {
     public nonisolated let unreadableItemCount: Int
     private var generation: Int64
     private var entries: [Entry]
+    private var undoStack: [DeletionRecord] = []
+
+    public var undoState: HistoryUndoState? {
+        undoStack.last.map { HistoryUndoState(id: $0.id, action: $0.action) }
+    }
 
     public init(databaseURL: URL, encryptionKey: SymmetricKey) throws {
         let database = try HistoryDatabase(url: databaseURL, key: encryptionKey)
@@ -144,17 +151,65 @@ public actor HistoryStore {
     }
 
     @discardableResult
-    public func delete(_ id: UUID) throws -> [ClipboardItem] {
-        try save(entries.filter { $0.item.id != id })
+    public func delete(_ id: UUID, undoable: Bool = false) throws -> [ClipboardItem] {
+        try saveRemoval(entries.filter { $0.item.id != id }, action: .delete, undoable: undoable)
     }
 
     @discardableResult
-    public func clear(_ ids: Set<UUID>, since: Date? = nil) throws -> [ClipboardItem] {
-        try save(entries.filter { entry in
+    public func clear(_ ids: Set<UUID>, since: Date? = nil, undoable: Bool = false) throws -> [ClipboardItem] {
+        try saveRemoval(entries.filter { entry in
             let item = entry.item
             if item.isProtected || !ids.contains(item.id) { return true }
             return since.map { item.activityAt < $0 } ?? false
-        })
+        }, action: .clear, undoable: undoable)
+    }
+
+    @discardableResult
+    public func undoDeletion() throws -> [ClipboardItem] {
+        guard let record = undoStack.last else { return snapshot() }
+        var next = entries
+        let removed = Dictionary(uniqueKeysWithValues: record.removed.map { ($0.item.id, $0) })
+        var anchor: UUID?
+        for id in record.order.reversed() {
+            guard let deleted = removed[id] else {
+                if next.contains(where: { $0.item.id == id }) { anchor = id }
+                continue
+            }
+            if let existing = next.firstIndex(where: { $0.item.id == id }) {
+                anchor = next[existing].item.id
+            } else if let existing = next.firstIndex(where: { $0.identity == deleted.identity }) {
+                var current = next[existing].item
+                if let currentNote = current.note, let priorNote = deleted.item.note, currentNote != priorNote {
+                    throw HistoryError.undoConflict
+                }
+                current.note = current.note ?? deleted.item.note
+                current.pinned = current.pinned || deleted.item.pinned
+                let count = current.copyCount.addingReportingOverflow(deleted.item.copyCount)
+                current.copyCount = count.overflow ? Int.max : count.partialValue
+                next[existing] = makeEntry(current)
+                anchor = current.id
+            } else {
+                let index = anchor.flatMap { following in next.firstIndex { $0.item.id == following } } ?? next.count
+                next.insert(deleted, at: index)
+                anchor = id
+            }
+        }
+        let restored = try save(next)
+        undoStack.removeLast()
+        return restored
+    }
+
+    private func saveRemoval(_ next: [Entry], action: HistoryUndoAction, undoable: Bool) throws -> [ClipboardItem] {
+        let remaining = Set(next.map { $0.item.id })
+        let removed = entries.filter { !remaining.contains($0.item.id) }
+        guard !removed.isEmpty else { return snapshot() }
+        let record = DeletionRecord(action: action, removed: removed, order: entries.map { $0.item.id })
+        let result = try save(next)
+        if undoable {
+            undoStack.append(record)
+            if undoStack.count > 20 { undoStack.removeFirst() }
+        }
+        return result
     }
 
     @discardableResult
@@ -219,6 +274,13 @@ public actor HistoryStore {
     private struct Entry: Equatable {
         var item: ClipboardItem
         let identity: Data
+    }
+
+    private struct DeletionRecord {
+        let id = UUID()
+        let action: HistoryUndoAction
+        let removed: [Entry]
+        let order: [UUID]
     }
 
     private func makeEntry(_ item: ClipboardItem) -> Entry {

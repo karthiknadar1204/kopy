@@ -401,3 +401,8 @@
 "Show all time" = "แสดงทุกช่วงเวลา";
 "Show history" = "แสดงประวัติ";
 "Another item already has this text. Edit that item or change the text." = "มีรายการอื่นที่มีข้อความนี้อยู่แล้ว โปรดแก้ไขรายการนั้นหรือเปลี่ยนข้อความ";
+"Undo delete" = "เลิกทำการลบ";
+"Undo clear history" = "เลิกทำการล้างประวัติ";
+"Item deleted" = "ลบรายการแล้ว";
+"History cleared" = "ล้างประวัติแล้ว";
+"A newer copy has a different note. Undo is still available." = "สำเนาที่ใหม่กว่ามีโน้ตต่างกัน ยังสามารถเลิกทำได้";

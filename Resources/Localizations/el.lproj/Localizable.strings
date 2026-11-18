@@ -401,3 +401,8 @@
 "Show all time" = "Εμφάνιση όλου του ιστορικού";
 "Show history" = "Εμφάνιση ιστορικού";
 "Another item already has this text. Edit that item or change the text." = "Ένα άλλο στοιχείο έχει ήδη αυτό το κείμενο. Επεξεργαστείτε το ή αλλάξτε το κείμενο.";
+"Undo delete" = "Αναίρεση διαγραφής";
+"Undo clear history" = "Αναίρεση εκκαθάρισης ιστορικού";
+"Item deleted" = "Το στοιχείο διαγράφηκε";
+"History cleared" = "Το ιστορικό εκκαθαρίστηκε";
+"A newer copy has a different note. Undo is still available." = "Ένα νεότερο αντίγραφο έχει διαφορετική σημείωση. Η αναίρεση παραμένει διαθέσιμη.";

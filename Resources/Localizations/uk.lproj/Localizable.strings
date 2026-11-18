@@ -401,3 +401,8 @@
 "Show all time" = "Показати за весь час";
 "Show history" = "Показати історію";
 "Another item already has this text. Edit that item or change the text." = "Інший елемент уже містить цей текст. Відредагуйте його або змініть текст.";
+"Undo delete" = "Скасувати видалення";
+"Undo clear history" = "Скасувати очищення історії";
+"Item deleted" = "Елемент видалено";
+"History cleared" = "Історію очищено";
+"A newer copy has a different note. Undo is still available." = "Новіша копія має іншу нотатку. Скасування залишається доступним.";

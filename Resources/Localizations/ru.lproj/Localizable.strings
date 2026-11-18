@@ -401,3 +401,8 @@
 "Show all time" = "Показать за всё время";
 "Show history" = "Показать историю";
 "Another item already has this text. Edit that item or change the text." = "Другой объект уже содержит этот текст. Измените тот объект или поменяйте текст.";
+"Undo delete" = "Отменить удаление";
+"Undo clear history" = "Отменить очистку истории";
+"Item deleted" = "Объект удалён";
+"History cleared" = "История очищена";
+"A newer copy has a different note. Undo is still available." = "У более новой копии другая заметка. Отмена по-прежнему доступна.";

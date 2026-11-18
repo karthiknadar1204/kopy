@@ -401,3 +401,8 @@
 "Show all time" = "הצגת כל הזמנים";
 "Show history" = "הצגת היסטוריה";
 "Another item already has this text. Edit that item or change the text." = "פריט אחר כבר מכיל את הטקסט הזה. ערכו אותו או שנו את הטקסט.";
+"Undo delete" = "ביטול מחיקה";
+"Undo clear history" = "ביטול ניקוי היסטוריה";
+"Item deleted" = "הפריט נמחק";
+"History cleared" = "ההיסטוריה נוקתה";
+"A newer copy has a different note. Undo is still available." = "לעותק חדש יותר יש הערה שונה. עדיין ניתן לבטל.";

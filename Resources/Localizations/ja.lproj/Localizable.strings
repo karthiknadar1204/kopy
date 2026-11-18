@@ -401,3 +401,8 @@
 "Show all time" = "すべての期間を表示";
 "Show history" = "履歴を表示";
 "Another item already has this text. Edit that item or change the text." = "このテキストは別の項目にすでに存在します。その項目を編集するか、テキストを変更してください。";
+"Undo delete" = "削除を取り消す";
+"Undo clear history" = "履歴の消去を取り消す";
+"Item deleted" = "項目を削除しました";
+"History cleared" = "履歴を消去しました";
+"A newer copy has a different note. Undo is still available." = "新しいコピーには別のメモがあります。取り消しは引き続き利用できます。";

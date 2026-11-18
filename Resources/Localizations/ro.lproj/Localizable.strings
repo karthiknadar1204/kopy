@@ -401,3 +401,8 @@
 "Show all time" = "Arată toată perioada";
 "Show history" = "Arată istoricul";
 "Another item already has this text. Edit that item or change the text." = "Un alt element conține deja acest text. Editează acel element sau schimbă textul.";
+"Undo delete" = "Anulează ștergerea";
+"Undo clear history" = "Anulează ștergerea istoricului";
+"Item deleted" = "Element șters";
+"History cleared" = "Istoric șters";
+"A newer copy has a different note. Undo is still available." = "O copie mai nouă are o notă diferită. Anularea este încă disponibilă.";

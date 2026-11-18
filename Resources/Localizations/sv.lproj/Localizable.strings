@@ -401,3 +401,8 @@
 "Show all time" = "Visa alla tidpunkter";
 "Show history" = "Visa historik";
 "Another item already has this text. Edit that item or change the text." = "Ett annat objekt innehåller redan denna text. Redigera det objektet eller ändra texten.";
+"Undo delete" = "Ångra radering";
+"Undo clear history" = "Ångra rensning av historik";
+"Item deleted" = "Objekt raderat";
+"History cleared" = "Historik rensad";
+"A newer copy has a different note. Undo is still available." = "En nyare kopia har en annan anteckning. Du kan fortfarande ångra.";

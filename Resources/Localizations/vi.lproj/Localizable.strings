@@ -401,3 +401,8 @@
 "Show all time" = "Hiện toàn bộ thời gian";
 "Show history" = "Hiện lịch sử";
 "Another item already has this text. Edit that item or change the text." = "Một mục khác đã có văn bản này. Hãy sửa mục đó hoặc thay đổi văn bản.";
+"Undo delete" = "Hoàn tác xóa";
+"Undo clear history" = "Hoàn tác xóa lịch sử";
+"Item deleted" = "Đã xóa mục";
+"History cleared" = "Đã xóa lịch sử";
+"A newer copy has a different note. Undo is still available." = "Bản sao mới hơn có ghi chú khác. Bạn vẫn có thể hoàn tác.";

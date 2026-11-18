@@ -401,3 +401,8 @@
 "Show all time" = "Vis alle tidspunkter";
 "Show history" = "Vis historik";
 "Another item already has this text. Edit that item or change the text." = "Et andet emne har allerede denne tekst. Rediger det emne, eller skift teksten.";
+"Undo delete" = "Fortryd sletning";
+"Undo clear history" = "Fortryd rydning af historik";
+"Item deleted" = "Emne slettet";
+"History cleared" = "Historik ryddet";
+"A newer copy has a different note. Undo is still available." = "En nyere kopi har en anden note. Du kan stadig fortryde.";
