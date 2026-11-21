@@ -1,6 +1,6 @@
 # Mac App Store readiness
 
-Reviewed November 18, 2026.
+Reviewed November 18, 2026. Updated November 21, 2026 for launch preparation; see docs/COMPLIANCE-PREP-2026-11.md for current evidence.
 
 ## Implemented and checked
 
@@ -14,7 +14,7 @@ Reviewed November 18, 2026.
 | Event posting | The temporary Accessibility grant was unavailable to the sandbox preview's event-posting API. The store build uses manual paste and compiles out event posting and its permission request. The temporary grant was switched off after the test. |
 | Persistent file scope | Tests/StoreSandbox created a read-only security-scoped bookmark through a user-selected fixture, quit, relaunched, and successfully read the stored reference. |
 | Existing file history | A regression test verifies decoding and opening a legacy record without the new scope flag. Another verifies scope metadata round trips. |
-| Privacy disclosure | PRIVACY.md and SUPPORT.md are public repository pages. The app links them from Settings, and onboarding links the policy. |
+| Privacy disclosure | The app and listing now link the public website privacy/support pages. PRIVACY.md and SUPPORT.md remain repository source copies. Settings and onboarding expose the policy. |
 | Privacy manifest | The store bundle includes Store/PrivacyInfo.xcprivacy. The reference repository's manifest validation completed successfully. |
 | Listing | The reference repository's metadata audit, including URL checks, reported zero findings for Store/metadata. |
 | Screenshots | Four fixture screenshots in Store/screenshots/en-US are 2560 by 1600 pixels. They use the actual SwiftUI views with store build conditions. |
@@ -30,7 +30,7 @@ The support and privacy contact uses karthiknadar1204@gmail.com, the repository 
 
 | Gate | Current state |
 | --- | --- |
-| Distribution signing | This Mac has Command Line Tools and no valid signing identities. The local preview is ad hoc signed. Add Xcode and the Apple developer team, then create and validate the distribution-signed archive. |
+| Distribution signing | The full Xcode 27.2 toolchain now builds the app and Store preview. The preview is ad hoc signed; Apple membership/team and distribution identities are deferred. Create and validate a distribution-signed archive after account setup. |
 | App Store Connect | App record, bundle registration, age-rating answers, App Privacy answers, review contact, encryption declaration, price, availability, agreements, and trader status require verification in the developer account. |
 | Final distribution build | Repeat Finder drops, drag-out to a sandboxed destination, managed images and stack selection, restart, sleep/wake, full-screen behavior, physical shortcut input, and multiple displays on the signed release. |
 | Review outcome | Apple has not reviewed or approved this build. |
@@ -38,3 +38,9 @@ The support and privacy contact uses karthiknadar1204@gmail.com, the repository 
 ## Release steps
 
 Follow Store/README.md to build, test, archive, and submit the store version. Re-run Scripts/check-store-bundle.sh on the final exported app. Update this record with the archive version, test OS versions, upload validation, and Apple review outcome.
+
+## November 21 preparation update
+
+The direct-download test build now uses Dodo activation; the Mac App Store target compiles out that entire flow. The Store bundle checker verifies the exclusion alongside Sparkle and event-posting exclusion. The latest native suite has 93 passing tests (32 core and 61 app), including licensing boundary, Keychain and access-gate cases. No distribution-signed build or Apple review has happened. Earlier test counts above are historical evidence.
+
+The website is a noindex prelaunch preview at https://kopy-website.vercel.app . Public unsigned downloads and live checkout remain unavailable. Google sign-in/account-deletion requirements do not apply because neither channel has customer accounts. Dodo purchase-data requests are a separate direct-channel support responsibility.

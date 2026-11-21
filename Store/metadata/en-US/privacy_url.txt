@@ -1,1 +1,1 @@
-https://github.com/karthiknadar1204/kopy/blob/main/PRIVACY.md
+https://kopy-website.vercel.app/privacy

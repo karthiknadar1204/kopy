@@ -11,7 +11,7 @@ Select an item to copy it, then press Command-V in the destination app to paste 
 Adjust shelf placement, appearance, history limits, and cleanup in Settings. Pins and notes protect items from automatic cleanup. Delete protected items individually when you want to remove them.
 
 Privacy policy
-https://github.com/karthiknadar1204/kopy/blob/main/PRIVACY.md
+https://kopy-website.vercel.app/privacy
 
 Support
-https://github.com/karthiknadar1204/kopy/blob/main/SUPPORT.md
+https://kopy-website.vercel.app/support

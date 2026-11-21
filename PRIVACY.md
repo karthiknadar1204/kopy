@@ -1,6 +1,6 @@
 # Kopy privacy policy
 
-Effective November 17, 2026.
+Effective November 21, 2026.
 
 Kopy is a clipboard history and file shelf for macOS, developed by Karthik Nadar.
 
@@ -16,9 +16,15 @@ Kopy saves clipboard history in an encrypted local SQLite database. It stores th
 
 Kopy has no account system, analytics SDK, advertising SDK, tracking identifier, or cloud sync. Clipboard history and search terms are processed on your Mac.
 
+The direct-download licence build uses Dodo Payments for purchases and software activation. Dodo collects the checkout information you provide, including your email and billing details, and provides receipts and licence delivery under its own [privacy policy](https://dodopayments.com/privacy-policy). Kopy does not receive or store your full payment-card details. The current preparation build connects only to Dodo's test environment; live sales and public signed downloads are not enabled.
+
+Direct licence activation sends the licence key and a generic installation name ("Kopy on Mac") to Dodo. Later validation and deactivation send the key and activation-instance identifier. The service also receives ordinary connection information such as your IP address. Kopy stores the licence credentials and validation date in a separate local Keychain item. It does not send clipboard history, notes, searches or file contents with licence requests. A previously validated licence can remain usable for up to 30 days during a connection failure. An explicit invalid or revoked result does not receive that grace period. Deactivation removes local licence credentials after the service confirms it; it does not delete history or the history encryption key. Licence checks and offline availability are separate from the purchase's non-expiring licence term.
+
+The Mac App Store build contains no Dodo licence activation or validation. Its purchase and updates use Apple's store mechanisms. Downloading the installer from the website does not itself establish a paid licence or grant access to the direct build.
+
 If you drop a supported image URL onto Kopy, Kopy requests the image from that address. The image host receives the request URL and ordinary connection information, including your IP address. Kopy uses an ephemeral session, disables cookies and stored credentials, rejects redirects, and limits the response size. The image host has its own privacy practices.
 
-Opening a saved link, this policy, or a support page opens your browser. Those websites have their own privacy practices. GitHub hosts this policy and the support pages.
+Opening a saved link, this policy, or a support page opens your browser. Those websites have their own privacy practices. The public Kopy website explains its hosting and any website data processing separately. This repository also retains policy and support source copies.
 
 The Mac App Store build receives updates through the Mac App Store. The separately distributed build can use Sparkle to request a configured update feed and download an update you select or enable. The update server receives normal connection metadata. Kopy disables Sparkle system profiling. The developer must publish the production update host before enabling that feed.
 

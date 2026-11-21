@@ -4,14 +4,14 @@ Kopy is a native macOS clipboard shelf. Move the pointer to the configured edge,
 
 ## Run locally
 
-Kopy requires macOS 14 or later and Swift 6.1. Apple's Command Line Tools or Xcode can supply the compiler and macOS SDK.
+Kopy targets macOS 14 or later. The verified toolchain is Xcode 27.2 (Swift 6.4.2). On this Mac, use the full Xcode developer directory: Command Line Tools alone could not load the SDK's SwiftUI macro plugin.
 
 ```sh
-Scripts/build-app.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer Scripts/build-app.sh
 open dist/Kopy.app
 ```
 
-To open the shelf with fixture cards for a visual check, quit any running copy of Kopy first and pass the demo flag.
+The default debug build supports fixture cards for a visual check. Quit any running copy of Kopy first and pass the demo flag. Release builds compile out these development switches and require Dodo test activation.
 
 ```sh
 open dist/Kopy.app --args --demo
@@ -45,3 +45,11 @@ The build script creates an ad hoc signed development bundle by default. See [Bu
 ## Mac App Store build
 
 [Prepare the sandboxed Mac App Store build](Store/README.md) for the store target, local preview, signing, and submission steps. [Privacy policy](PRIVACY.md). [Support](SUPPORT.md).
+
+## Prelaunch website and direct test licensing
+
+The [website preview](https://kopy-website.vercel.app) is built in [kopy-website](https://github.com/karthiknadar1204/kopy-website). It has public privacy/support pages and a clearly labelled Dodo TEST checkout. No live payment or signed public installer is offered yet.
+
+The strict direct release uses the configured test product. Buy only with Dodo's documented test details, use the emailed test licence in the activation screen, and manage the single active Mac under Settings → System → Licence. No customer account or private merchant API key belongs in the app. Credentials use a separate Keychain item; licence changes preserve local history and Undo. Store builds have no Dodo activation flow.
+
+[Launch evidence and remaining gates](docs/LAUNCH-PREP.md) records the verified tests and the test-wallet restriction that prevented a successful refund check. [Compliance preparation](docs/COMPLIANCE-PREP-2026-11.md) distinguishes source scanner findings from actual bundle checks. Apple account setup, final distribution signing, the final domain and live commerce are deferred.

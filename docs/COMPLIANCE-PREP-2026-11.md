@@ -24,9 +24,33 @@ The whole-checkout guard's legal-deadline list is generic reference output. It d
 
 ## Final checks for this preparation pass
 
-- [ ] Direct licensing tests and app UI.
-- [ ] Store build excludes licence code, Dodo hosts and Sparkle.
-- [ ] Accurate privacy manifest and metadata URL audit.
-- [ ] Website legal/support links open without authentication.
-- [ ] Fixture screenshots and manual copy instructions match Store build.
-- [ ] Record remaining final-signed-build/physical-device checks honestly.
+- [x] Direct licensing tests and app UI.
+- [x] Store build excludes licence code, Dodo hosts and Sparkle.
+- [x] Accurate privacy manifest and metadata URL audit.
+- [x] Website legal/support links open without authentication.
+- [x] Fixture screenshots and manual copy instructions match Store build.
+- [x] Record remaining final-signed-build/physical-device checks honestly.
+
+## Final preparation evidence
+
+The full playbook release audit completed, including its own internal validation, and returned exit 2 / BLOCKED: 2 critical, 3 high and 2 medium findings. It was not overridden or represented as approval. The raw report was retained privately as /tmp/kopy-launch-evidence/RELEASE-READINESS-REPORT.md; the app's current, scoped dispositions are below.
+
+| Full-audit finding | Actual artifact evidence and disposition |
+| --- | --- |
+| Staging backend | The whole checkout includes Sparkle samples, generated files and the direct TEST-licence channel. That direct binary is intentionally unsuitable for a live release. The actual Store preview has no Dodo host/licensing, Sparkle or development bypass flags, as verified by the bundle checker. Do not replace the test endpoint with a live endpoint in this preparation phase. |
+| Missing privacy manifest | Store/PrivacyInfo.xcprivacy is copied into the actual sandboxed app and passes the playbook validator and plutil. Dependency sample headers are not Kopy's Store app. |
+| Missing policy link | KopyLinks, Settings, onboarding and the empty state link the public website policy. Public URLs return 200 without authentication. The scanner's limited source scope is not a complete view of shared Swift sources. |
+| Missing export declaration | The actual Store Info.plist contains ITSAppUsesNonExemptEncryption=false. Review the system CryptoKit/HTTPS exemption and final App Store Connect answers when the final distribution binary exists. |
+| Missing Nutrition Labels | The actual Store privacy manifest explicitly includes NSPrivacyCollectedDataTypes as an empty array and NSPrivacyTracking=false. Store code excludes direct Dodo licensing. Local-only clipboard processing is not falsely declared as server collection to satisfy a regex. App Store Connect privacy answers still need the Apple account and final dependency review. |
+| Button haptics | Reported files are project skill reference Markdown. This is an iOS-oriented advisory, not proof of a macOS accessibility defect. Do not add UIKit haptics to a Mac utility. |
+| Age questionnaire | Real manual release gate: complete accurate answers in App Store Connect after the account is available. |
+
+Latest local verification: 93 tests pass (32 core + 61 app), direct strict release builds, and sandboxed Store preview builds and passes Scripts/check-store-bundle.sh. This checks code-signature structure using ad hoc signing, sandbox, resources, privacy manifest, updater/event-posting/development-flag/direct-licence exclusion. It does not validate an Apple distribution signature or upload.
+
+The final listing metadata audit, including the new website URLs, reports zero critical/high/medium/low findings. Privacy-manifest validation exits 0. Actual native licence UI activated an issued Dodo test key, restored it on relaunch, deactivated and reactivated it, and blocked access after explicit remote revocation. The isolated encrypted history file remained byte-identical after revocation. Native automated tests additionally cover recoverable deletion records surviving a licence lock. The Dodo refund request failed due to test-wallet funds, so successful refund processing and automatic revocation remain unverified.
+
+Desktop website and 390px phone-width guide/purchase layouts were reviewed in Chrome. Semantic headings, skip navigation, alt text, labelled controls, keyboard focus styles and responsive content are present. This was not a complete VoiceOver or all-language release audit. The new direct-test licensing copy is English; its Store exclusion keeps it outside this Store preparation UI.
+
+The app and website have no customer accounts or Google sign-in. Google OAuth brand approval and account-deletion flows are not applicable. GumCLI's operator reporting permission is a separate Search Console setup; it currently reports SCOPE_MISSING and final-domain verification is deferred.
+
+The app's final distribution build must still be signed and exercised on real hardware, including sleep/wake, login launch, multiple displays, drag/cancel and permission denial. Existing development checks do not substitute for that final build. Apple has not reviewed or approved this app. No Google Play submission is planned for this macOS app.

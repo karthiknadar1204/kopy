@@ -58,7 +58,7 @@ ITSAppUsesNonExemptEncryption is false for the store build because it uses Apple
 
 ## Complete App Store Connect
 
-The English draft listing and review notes are in Store/metadata/en-US. The support and privacy pages are public files in this repository.
+The English draft listing and review notes are in Store/metadata/en-US. The support and privacy URLs point to the public prelaunch website. PRIVACY.md and SUPPORT.md are maintained as source copies in this repository. Replace the preview origin with the final domain before release.
 
 Before submitting, complete these items in App Store Connect.
 

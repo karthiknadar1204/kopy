@@ -1,5 +1,15 @@
 # Kopy support
 
+## Direct-download test licensing
+
+The preparation build uses Dodo Payments test-mode licences. No public signed download or live purchase is available yet. Open the activation window, paste the key from the test purchase email, and choose Activate Kopy. There is no Kopy customer account or Google sign-in.
+
+One licence allows one active Mac. Use Settings → System → Licence → Deactivate this Mac before activating another installation. If a connection failure prevents deactivation, keep the existing credentials and retry when connected. An invalid or refunded licence cannot be used for new activation. A previously validated installation has a bounded offline grace period; this is not a licence-expiration date. Licensing does not delete your clipboard history.
+
+If the email is missing, check Spam and the address entered at checkout, then contact support with the receipt reference. Do not post a licence key or payment information in a public issue. Self-service email recovery is not promised until the provider's available recovery flow has been verified.
+
+The Mac App Store build has no Dodo activation screen. Final signed-build purchasing and distribution checks remain pending the Apple Developer account.
+
 Kopy is a macOS clipboard shelf. For help or privacy questions, email **karthiknadar1204@gmail.com**.
 
 To report a reproducible issue, open [a GitHub issue](https://github.com/karthiknadar1204/kopy/issues). Public issues can be read by anyone. Remove private clipboard contents, file paths, passwords, and account information before attaching a screenshot or log.
