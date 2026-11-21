@@ -39,6 +39,9 @@ final class KopyModel {
     let isDemo: Bool
 #if !KOPY_APP_STORE
     let updater: KopyUpdater
+    @ObservationIgnored var license: LicenseController?
+    @ObservationIgnored var showLicense: (() -> Void)?
+    private(set) var isLicenseAccessEnabled = false
 #endif
     private let isolatedProfile: URL?
 
@@ -64,14 +67,22 @@ final class KopyModel {
     @ObservationIgnored var keepShelfOpen: ((Duration) -> Void)?
 
     init(demo: Bool = false, isolatedProfile: URL? = nil, clipboard: ClipboardController = ClipboardController()) {
+#if DEBUG
         isDemo = demo
         self.isolatedProfile = isolatedProfile
-        self.clipboard = clipboard
-        defaults = isolatedProfile.map { UserDefaults(suiteName: "Kopy.Test.\($0.lastPathComponent)") ?? .standard } ?? .standard
-#if !KOPY_APP_STORE
-        updater = KopyUpdater(enabled: !demo && isolatedProfile == nil, defaults: defaults)
+#else
+        isDemo = false
+        self.isolatedProfile = nil
 #endif
-        if demo {
+        self.clipboard = clipboard
+        defaults = self.isolatedProfile.map { UserDefaults(suiteName: "Kopy.Test.\($0.lastPathComponent)") ?? .standard } ?? .standard
+#if !KOPY_APP_STORE
+        updater = KopyUpdater(enabled: !isDemo && self.isolatedProfile == nil, defaults: defaults)
+#if DEBUG
+        isLicenseAccessEnabled = isDemo || self.isolatedProfile != nil
+#endif
+#endif
+        if isDemo {
             items = Self.examples
             expandedPinnedFilters = Set(ClipboardFilter.allCases.map(\.rawValue))
             return
@@ -110,7 +121,7 @@ final class KopyModel {
     }
 
     func start() {
-        guard !isDemo, !isLoadingHistory, history == nil else { return }
+        guard canUseProduct, !isDemo, !isLoadingHistory, history == nil else { return }
         isLoadingHistory = true
         let profile = isolatedProfile
         let service = Bundle.main.bundleIdentifier ?? "com.karthiknadar.kopy"
@@ -132,8 +143,12 @@ final class KopyModel {
                 }
                 do {
                     let settings = self.preferences
-                    let existing = try await store.prune(preferences: settings)
-                    self.items = settings.clearOnRestart ? try await store.clear(Set(existing.map(\.id))) : existing
+                    if self.canUseProduct {
+                        let existing = try await store.prune(preferences: settings)
+                        self.items = settings.clearOnRestart ? try await store.clear(Set(existing.map(\.id))) : existing
+                    } else {
+                        self.items = await store.snapshot()
+                    }
                 } catch {
                     self.inform(error)
                 }
@@ -147,9 +162,9 @@ final class KopyModel {
     }
 
     private func startCapture() {
-        clipboard.isPaused = isSuspended || preferences.incognito
+        clipboard.isPaused = isSuspended || preferences.incognito || !canUseProduct
         clipboard.start { [weak self] payload in
-            guard let self else { return }
+            guard let self, self.canUseProduct else { return }
             let settings = self.preferences
             self.mutate { store in
                 try await store.capture(payload, preferences: settings)
@@ -163,8 +178,26 @@ final class KopyModel {
 
     func suspend(_ value: Bool) {
         isSuspended = value
-        clipboard.isPaused = value || preferences.incognito
+        clipboard.isPaused = value || preferences.incognito || !canUseProduct
     }
+
+    var canUseProduct: Bool {
+#if KOPY_APP_STORE
+        true
+#else
+        isLicenseAccessEnabled
+#endif
+    }
+
+#if !KOPY_APP_STORE
+    func openLicense() { showLicense?() }
+
+    func setLicenseAccess(_ enabled: Bool) {
+        isLicenseAccessEnabled = enabled
+        clipboard.isPaused = isSuspended || preferences.incognito || !enabled
+        if enabled { start() }
+    }
+#endif
 
     func prune() {
         guard !isDemo else { return }
@@ -201,7 +234,7 @@ final class KopyModel {
         if !isDemo, let data = try? JSONEncoder().encode(next) {
             defaults.set(data, forKey: "shelfPreferences")
         }
-        if captureChanged { clipboard.isPaused = isSuspended || next.incognito }
+        if captureChanged { clipboard.isPaused = isSuspended || next.incognito || !canUseProduct }
         if retentionChanged { prune() }
         preferencesChanged?(next)
     }
@@ -271,7 +304,7 @@ final class KopyModel {
     }
 
     func pasteClipboard(into filter: ClipboardFilter) {
-        guard !isDemo else { return }
+        guard canUseProduct, !isDemo else { return }
         guard let payload = clipboard.importCurrent() else {
             inform("There’s no supported item to import from the clipboard.")
             return
@@ -281,7 +314,7 @@ final class KopyModel {
     }
 
     func importPayloads(_ payloads: [ClipboardPayload], showing filter: ClipboardFilter = .all) {
-        guard !isDemo, !payloads.isEmpty else { return }
+        guard canUseProduct, !isDemo, !payloads.isEmpty else { return }
         let settings = preferences
         mutate({ try await $0.importPayloads(payloads, preferences: settings) }, onSuccess: { [weak self] updated in
             self?.importFilter = filter
@@ -296,6 +329,7 @@ final class KopyModel {
     }
 
     func beginSnippet() {
+        guard canUseProduct else { return }
         if snippetDraft == nil { snippetDraft = SnippetDraft(itemID: nil, text: "") }
     }
 
@@ -348,6 +382,7 @@ final class KopyModel {
         _ payload: ClipboardPayload, itemID: UUID? = nil, promotes: Bool = false, plain: Bool = false,
         capturedAt: Date = .now
     ) {
+        guard canUseProduct else { return }
         guard !isDemo else { inform("Demo item"); return }
         let now = ContinuousClock.now
         if let lastPaste, lastPaste.duration(to: now) < .milliseconds(600) { return }
@@ -379,7 +414,7 @@ final class KopyModel {
     }
 
     func copy(_ item: ClipboardItem, members: Set<UUID>? = nil) {
-        guard let payload = payload(for: item, members: members), !isDemo else { return }
+        guard canUseProduct, let payload = payload(for: item, members: members), !isDemo else { return }
         do {
             lastCopiedItem = (item.id, try clipboard.copy(payload, capturedAt: item.activityAt))
             mutate { try await $0.touch(item.id) }
@@ -390,7 +425,7 @@ final class KopyModel {
     }
 
     func copyText(_ text: String) {
-        guard !isDemo else { return }
+        guard canUseProduct, !isDemo else { return }
         do {
             _ = try clipboard.copy(.text(ClipboardText(text)))
             lastCopiedItem = nil
@@ -490,7 +525,7 @@ final class KopyModel {
     }
 
     func openLink(_ item: ClipboardItem) {
-        guard !isDemo, case .text(let text) = item.payload, let url = text.webURL else { return }
+        guard canUseProduct, !isDemo, case .text(let text) = item.payload, let url = text.webURL else { return }
         NSWorkspace.shared.open(url)
     }
 
@@ -500,7 +535,7 @@ final class KopyModel {
     }
 
     func reveal(_ file: ClipboardFile) {
-        guard !isDemo else { return }
+        guard canUseProduct, !isDemo else { return }
         do {
             let transfer = try clipboard.prepareTransfer(for: file)
             withExtendedLifetime(transfer) {
@@ -512,7 +547,7 @@ final class KopyModel {
     }
 
     func copyPaths(_ files: [ClipboardFile]) {
-        guard !isDemo else { return }
+        guard canUseProduct, !isDemo else { return }
         do {
             let paths = try files.map { try clipboard.prepareTransfer(for: $0).url.path }
             copyText(paths.joined(separator: "\n"))
@@ -522,7 +557,7 @@ final class KopyModel {
     }
 
     func saveImages(_ item: ClipboardItem, members: Set<UUID>? = nil) {
-        guard !isDemo, let payload = payload(for: item, members: members) else { return }
+        guard canUseProduct, !isDemo, let payload = payload(for: item, members: members) else { return }
         do {
             let files = try clipboard.exportImages(payload, note: item.note, capturedAt: item.activityAt)
             if !files.isEmpty {
@@ -538,7 +573,7 @@ final class KopyModel {
     }
 
     func nativeDragItems(_ item: ClipboardItem, members: Set<UUID>?) -> [NSDraggingItem] {
-        guard !isDemo, let payload = payload(for: item, members: members) else { return [] }
+        guard canUseProduct, !isDemo, let payload = payload(for: item, members: members) else { return [] }
         let selection = DragSelection(source: item.id, members: members, token: UUID())
         do {
             let items = try clipboard.dragItems(
@@ -606,20 +641,20 @@ final class KopyModel {
         onFailure: (() -> Void)? = nil,
         onSuccess: (([ClipboardItem]) -> Void)? = nil
     ) {
-        guard !isDemo, history != nil || isLoadingHistory else { onFailure?(); return }
+        guard canUseProduct, !isDemo, history != nil || isLoadingHistory else { onFailure?(); return }
         let previous = mutation
         mutation = Task { @MainActor [weak self] in
             await previous?.value
-            guard let history = self?.history else { return }
+            guard let self, let history = self.history else { onFailure?(); return }
             do {
                 let updated = try await action(history)
                 let undoState = await history.undoState
-                self?.items = updated
-                self?.undoState = undoState
+                self.items = updated
+                self.undoState = undoState
                 onSuccess?(updated)
             } catch {
                 onFailure?()
-                self?.inform(error)
+                self.inform(error)
             }
         }
     }

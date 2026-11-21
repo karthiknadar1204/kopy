@@ -17,8 +17,12 @@ if [[ -n "$feed_url" || -n "$public_key" ]]; then
     fi
 fi
 
-swift build -c "$configuration"
-bin_dir="$(swift build -c "$configuration" --show-bin-path)"
+build_arguments=(-c "$configuration")
+if [[ -n "${KOPY_BUILD_SCRATCH_PATH:-}" ]]; then
+    build_arguments+=(--scratch-path "$KOPY_BUILD_SCRATCH_PATH")
+fi
+swift build "${build_arguments[@]}"
+bin_dir="$(swift build "${build_arguments[@]}" --show-bin-path)"
 bundle="$PWD/dist/Kopy.app"
 contents="$bundle/Contents"
 mkdir -p "$contents/MacOS" "$contents/Resources" "$contents/Frameworks"

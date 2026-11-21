@@ -36,6 +36,10 @@ if strings "$contents/MacOS/$executable" | grep -E -- '^--(test-profile|test-sta
     printf 'Development launch options are present in the store build.\n' >&2
     exit 1
 fi
+if strings "$contents/MacOS/$executable" | grep -E 'test\.dodopayments\.com|license-key|LicenseController|DodoLicenseClient'; then
+    printf 'Direct-download licensing is present in the store build.\n' >&2
+    exit 1
+fi
 
 test -f "$contents/Resources/en.lproj/Localizable.strings"
 test -f "$contents/Resources/Emoji/emoji-16.json"

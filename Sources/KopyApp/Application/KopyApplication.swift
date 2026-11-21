@@ -30,12 +30,16 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     private var suspension = ShelfSuspension()
 #if !KOPY_APP_STORE
     private var holdTestShelf = false
+    private var licenseWindow: NSWindow?
+    private var licenseRefresh: Task<Void, Never>?
+    private var licenseRestored = false
 #endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
 #if KOPY_APP_STORE
         model = KopyModel()
 #else
+#if DEBUG
         let arguments = CommandLine.arguments
         let demo = arguments.contains("--demo")
         let isolated: URL?
@@ -46,6 +50,19 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         holdTestShelf = isolated != nil && arguments.contains("--test-stay-open")
         model = KopyModel(demo: demo, isolatedProfile: isolated)
+#else
+        model = KopyModel()
+#endif
+        if !model.canUseProduct {
+            let configuration = try? LicenseConfiguration()
+            let license = LicenseController(
+                configuration: configuration,
+                client: configuration.map { DodoLicenseClient(configuration: $0) },
+                store: KeychainLicenseStore(service: Bundle.main.bundleIdentifier ?? "com.karthiknadar.kopy")
+            )
+            model.license = license
+            license.permissionChanged = { [weak self] enabled in self?.applyLicenseAccess(enabled) }
+        }
 #endif
         shelf = EdgeShelfWindow(content: KopyLanguageRoot(model: model) { [model = model!] in ShelfView(model: model) })
         bindModel()
@@ -58,9 +75,15 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
 #endif
         shelf.update(model.preferences)
         shelf.start()
+        shelf.setSuspended(!model.canUseProduct)
         bindShortcut()
         let prune = Timer(timeInterval: 60, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.model.prune() }
+            MainActor.assumeIsolated {
+                self?.model.prune()
+#if !KOPY_APP_STORE
+                self?.refreshLicense()
+#endif
+            }
         }
         RunLoop.main.add(prune, forMode: .common)
         scheduledPrune = prune
@@ -68,12 +91,15 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
 #if KOPY_APP_STORE
         if model.isTourDue, SMAppService.mainApp.status != .enabled { showTour() }
 #else
+#if DEBUG
         if demo || arguments.contains("--show") {
             showShelf()
         } else if model.isTourDue, !arguments.contains("--quiet"), isolated == nil,
                   SMAppService.mainApp.status != .enabled {
             showTour()
         }
+#endif
+        if model.license != nil { refreshLicense(); showLicense() }
 #endif
     }
 
@@ -88,6 +114,10 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         model?.stop()
         scheduledPrune?.invalidate()
         handoff?.cancel()
+#if !KOPY_APP_STORE
+        licenseRefresh?.cancel()
+        model?.license?.stop()
+#endif
         workspaceObservers.forEach(NSWorkspace.shared.notificationCenter.removeObserver)
         appObservers.forEach(NotificationCenter.default.removeObserver)
     }
@@ -96,6 +126,9 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         model.hideShelf = { [weak self] in self?.shelf.close() }
         model.showSettings = { [weak self] in self?.showSettings() }
         model.showTour = { [weak self] in self?.showTour() }
+#if !KOPY_APP_STORE
+        model.showLicense = { [weak self] in self?.showLicense() }
+#endif
         model.tourCompleted = { [weak self] in
             guard let self, let window = tourWindow else { return }
             tourWindow = nil
@@ -121,7 +154,7 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         shelf.onDragChange = { [weak self] targeted in self?.model.isDropTargeted = targeted }
         shelf.onDrop = { [weak self] board in
-            guard let self, !model.isDemo else { return false }
+            guard let self, model.canUseProduct, !model.isDemo else { return false }
             return model.clipboard.receiveDrop(board) { [weak self] payloads in
                 self?.model.importPayloads(payloads)
             }
@@ -132,6 +165,7 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     private var attemptedShortcut: ShelfShortcut?
 
     private func bindShortcut() {
+        guard model.canUseProduct else { shortcut.clear(); return }
         let keys = model.preferences.shortcut
         attemptedShortcut = keys
         if !shortcut.register(keys, action: { [weak self] in self?.shelf.toggle() }) {
@@ -171,6 +205,9 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
             MainActor.assumeIsolated {
                 self?.model.refreshPermissions()
                 self?.model.refreshLoginState()
+#if !KOPY_APP_STORE
+                self?.refreshLicense()
+#endif
             }
         })
     }
@@ -178,7 +215,7 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func applySuspension(_ name: Notification.Name) {
         guard let suspended = suspension.handle(name) else { return }
         handoff?.cancel()
-        shelf.setSuspended(suspended)
+        shelf.setSuspended(suspended || !model.canUseProduct)
         if suspended {
             model.suspend(true)
         } else {
@@ -295,6 +332,9 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     }
 
     @objc private func showShelf() {
+#if !KOPY_APP_STORE
+        guard model.canUseProduct else { showLicense(); return }
+#endif
         shelf.show(waitForPointerEntry: true)
 #if !KOPY_APP_STORE
         if holdTestShelf { shelf.holdOpen(for: .seconds(60)) }
@@ -309,6 +349,9 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
 #endif
 
     @objc private func importClipboard() {
+#if !KOPY_APP_STORE
+        guard model.canUseProduct else { showLicense(); return }
+#endif
         model.importClipboard()
         shelf.show()
     }
@@ -350,6 +393,9 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
     }
 
     @objc private func showTour() {
+#if !KOPY_APP_STORE
+        guard model.canUseProduct else { showLicense(); return }
+#endif
         shelf.close()
         if let tourWindow { present(tourWindow); return }
         let window = makeWindow(
@@ -362,6 +408,48 @@ private final class KopyDelegate: NSObject, NSApplicationDelegate, NSMenuDelegat
         tourWindow = window
         present(window)
     }
+
+#if !KOPY_APP_STORE
+    private func refreshLicense() {
+        guard let license = model.license, licenseRefresh == nil else { return }
+        licenseRefresh = Task { @MainActor [weak self] in
+            guard let self else { return }
+            if !licenseRestored {
+                licenseRestored = true
+                await license.restore()
+            } else {
+                await license.refresh()
+            }
+            self.licenseRefresh = nil
+        }
+    }
+
+    private func applyLicenseAccess(_ enabled: Bool) {
+        if !enabled { shelf.close() }
+        model.setLicenseAccess(enabled)
+        shelf.setSuspended(!enabled || !suspension.isEmpty)
+        bindShortcut()
+        if enabled {
+            licenseWindow?.close()
+            licenseWindow = nil
+            if model.isTourDue { showTour() } else { showShelf() }
+        } else {
+            tourWindow?.close()
+            settingsWindow?.close()
+            showLicense()
+        }
+    }
+
+    @objc private func showLicense() {
+        guard let license = model.license else { return }
+        shelf.close()
+        if let licenseWindow { present(licenseWindow); return }
+        let window = makeWindow(title: "Kopy Licence", size: NSSize(width: 460, height: 540),
+                                minimumSize: NSSize(width: 420, height: 480), content: LicenseView(license: license))
+        licenseWindow = window
+        present(window)
+    }
+#endif
 
     func windowWillClose(_ notification: Notification) {
         guard let window = notification.object as? NSWindow, window === tourWindow else { return }

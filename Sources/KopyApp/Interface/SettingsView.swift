@@ -99,6 +99,14 @@ struct SettingsView: View {
                 LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
             }
 #else
+            if let license = model.license {
+                Section("Licence") {
+                    Label(license.status.permitsUse ? "Activated on this Mac" : "Activation required",
+                          systemImage: license.status.permitsUse ? "checkmark.seal" : "key")
+                    Button("Manage licence", action: model.openLicense)
+                    Text("Test build. No real payments.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
             KopyUpdateSection(updater: model.updater)
 #endif
         }
