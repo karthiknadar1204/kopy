@@ -12,7 +12,7 @@ Started 2026-11-21. Scope: account-free website and Dodo test licensing, app com
 - [x] Audit app, metadata, privacy and accessibility; document scanner scope and deferred release gates.
 - [x] Deploy a preview and verify public routes.
 - [x] Prepare SEO, reporting, daily site checks and unpublished launch drafts.
-- [ ] Final evidence review and clean pushed repositories.
+- [x] Final evidence review and pushed implementation milestones.
 
 ## Architecture decision
 
@@ -52,3 +52,7 @@ Working tree was clean at 3ddd543. The first command-line-tools test attempt fai
 5. Publish a signed installer and decide when to enable indexing/live sales. No public unsigned installer, live charge, App Store submission or social post was made in this preparation pass.
 
 Commands and search/distribution handoff are in the website repository's docs/SEO-OPERATIONS.md. The compliance finding dispositions are in docs/COMPLIANCE-PREP-2026-11.md.
+
+## Final hosted checks
+
+Native milestone 42dbe87 passed GitHub's tests, Store archive and archived-bundle inspection: https://github.com/karthiknadar1204/kopy/actions/runs/44871145766 . The website's current CI actions use supported Node 24 runtimes; its deployed-site monitor also passed after that update: https://github.com/karthiknadar1204/kopy-website/actions/runs/44871226555 . The website handoff additionally records the keyboard skip-link correction and live canonical-origin checks. No private merchant key or real clipboard data was committed.
