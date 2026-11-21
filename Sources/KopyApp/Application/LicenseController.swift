@@ -149,6 +149,7 @@ final class LicenseController {
                                          environment: configuration.environment, lastValidatedAt: now())
             }
             guard epoch == operation, !Task.isCancelled else { return }
+            store.offlineAllowed = false
             credential = next
             hasCredential = true
             guard try await client.validate(next) else { throw LicenseIssue.invalidKey }

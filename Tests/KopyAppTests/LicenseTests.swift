@@ -138,6 +138,20 @@ struct LicenseTests {
         #expect(LicenseURLProtocol.responses.requests.filter { $0.url?.path == "/licenses/activate" }.count == 1)
     }
 
+    @Test("An activation without successful validation cannot obtain offline grace by retrying")
+    func unverifiedActivation() async throws {
+        let (service, store) = try fixtures([
+            .init(body: #"{"id":"lki_fixture","product":{"product_id":"pdt_fixture"}}"#),
+            .init(error: .notConnectedToInternet), .init(error: .notConnectedToInternet)
+        ])
+        let controller = LicenseController(configuration: try configuration(), client: service, store: store, now: { now })
+        await controller.activate("fixture-license")
+        #expect(!controller.status.permitsUse)
+        await controller.refresh(force: true)
+        #expect(!controller.status.permitsUse)
+        #expect(!store.offlineAllowed)
+    }
+
     @Test("Stopping the controller prevents an old validation from restoring access")
     func staleResponse() async throws {
         let service = SuspendedLicenseService()
