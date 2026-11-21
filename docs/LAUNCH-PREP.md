@@ -35,7 +35,7 @@ Working tree was clean at 3ddd543. The first command-line-tools test attempt fai
 ## Verified preparation results
 
 - Public preview: https://kopy-website.vercel.app . All 24 HTML, Markdown, discovery, checkout-information and share-image checks pass. HTML returns `noindex` in headers and metadata. The Vercel production alias is used as a prelaunch preview, not an indexed launch or live payment release.
-- Native tests: 93 passing (32 core, 61 app). Direct release and sandboxed Store preview build. GitHub macOS build/archive inspection passed for native licensing milestone 3243a50.
+- Native tests: 96 passing (32 core, 64 app). Direct release and sandboxed Store preview build. GitHub macOS build/archive inspection passed for native licensing milestone 3243a50.
 - Dodo TEST: USD 2.99, one non-expiring personal licence, one active Mac. Hosted failed-card and successful-card outcomes verified against API status. The user confirmed both receipt and licence emails arrived. Public licence activation, validation, activation-limit denial and deactivation were exercised.
 - Actual native strict release: activated using the issued test key in an isolated bundle/home/Keychain identity, quit and reopened activated, deactivated through UI and returned to the activation gate, then reactivated. A saved disposable snippet remained in the same encrypted history file after manual remote revocation; the app denied access on reopening. No normal Kopy history or history encryption key was changed by the fixture.
 - Refund attempted in TEST: Dodo returned HTTP 409 `INSUFFICIENT_WALLET_FUNDS`. No refund succeeded. Manual grant revocation succeeded and tested the explicit-invalid path; this does not establish automatic refund-to-revocation behaviour. Re-run the complete refund path when the test wallet supports it.
@@ -56,3 +56,9 @@ Commands and search/distribution handoff are in the website repository's docs/SE
 ## Final hosted checks
 
 Native milestone 42dbe87 passed GitHub's tests, Store archive and archived-bundle inspection: https://github.com/karthiknadar1204/kopy/actions/runs/44871145766 . The website's current CI actions use supported Node 24 runtimes; its deployed-site monitor also passed after that update: https://github.com/karthiknadar1204/kopy-website/actions/runs/44871226555 . The website handoff additionally records the keyboard skip-link correction and live canonical-origin checks. No private merchant key or real clipboard data was committed.
+
+## Interrupted activation recovery
+
+A final review found that a successful allocation followed by first-validation connection failure could lose its instance on quit. The corrected flow persists the pending instance in Keychain with no offline entitlement before validation. A new controller restores that same instance and retries validation without allocating a second seat. If Keychain cannot save it, the app attempts to release the newly allocated seat; failed release leaves the app locked with explicit keep-open/retry guidance. A different licence cannot silently replace an existing activation. The final 96-test suite includes a real isolated-Keychain relaunch test and rollback/replacement cases; direct release and Store bundle checks pass.
+
+The issued test licence used for live checks was deliberately revoked. It is not a production purchase or a usable ongoing licence. A fresh successful TEST checkout issues another test key when further testing is needed. Use a fresh, unrevoked grant for the future automatic refund/revocation test.

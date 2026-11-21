@@ -121,21 +121,91 @@ struct LicenseTests {
         #expect(!store.offlineAllowed)
     }
 
-    @Test("A failed Keychain save cannot unlock the app or allocate another activation on retry")
+    @Test("A failed pending Keychain save releases the allocated seat before a fresh retry")
     func persistenceFailure() async throws {
         let (service, store) = try fixtures([
             .init(body: #"{"id":"lki_fixture","product":{"product_id":"pdt_fixture"}}"#),
-            .init(body: #"{"valid":true}"#), .init(body: #"{"valid":true}"#)
+            .init(status: 204),
+            .init(body: #"{"id":"lki_retry","product":{"product_id":"pdt_fixture"}}"#),
+            .init(body: #"{"valid":true}"#)
         ])
         store.failSave = true
         let controller = LicenseController(configuration: try configuration(), client: service, store: store, now: { now })
         await controller.activate("fixture-license")
         #expect(!controller.status.permitsUse)
         #expect(controller.issue == .storage)
+        #expect(!controller.hasCredential)
+        #expect(LicenseURLProtocol.responses.requests.map { $0.url?.path } == ["/licenses/activate", "/licenses/deactivate"])
         store.failSave = false
         await controller.activate("fixture-license")
         #expect(controller.status == .active)
-        #expect(LicenseURLProtocol.responses.requests.filter { $0.url?.path == "/licenses/activate" }.count == 1)
+        #expect(store.value?.instanceID == "lki_retry")
+        #expect(LicenseURLProtocol.responses.requests.filter { $0.url?.path == "/licenses/activate" }.count == 2)
+    }
+
+    @Test("A first validation connection failure survives relaunch without allocating another seat")
+    func pendingActivationRelaunch() async throws {
+        let (service, _) = try fixtures([
+            .init(body: #"{"id":"lki_fixture","product":{"product_id":"pdt_fixture"}}"#),
+            .init(error: .notConnectedToInternet), .init(body: #"{"valid":true}"#)
+        ])
+        let identifier = "com.kopy.pending-fixture.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: identifier))
+        let store = KeychainLicenseStore(service: identifier, defaults: defaults)
+        defer { try? store.remove(); defaults.removePersistentDomain(forName: identifier) }
+        let first = LicenseController(configuration: try configuration(), client: service, store: store, now: { now })
+        await first.activate("fixture-license")
+        #expect(!first.status.permitsUse)
+        #expect(!store.offlineAllowed)
+        let stored = try store.load()
+        let saved = try #require(stored)
+        #expect(saved.instanceID == "lki_fixture")
+        #expect(saved.lastValidatedAt == .distantPast)
+        let reopenedStore = KeychainLicenseStore(service: identifier, defaults: defaults)
+        let reopened = LicenseController(configuration: try configuration(), client: service, store: reopenedStore, now: { now })
+        await reopened.restore()
+        #expect(reopened.status == .active)
+        #expect(try reopenedStore.load()?.instanceID == "lki_fixture")
+        #expect(try reopenedStore.load()?.lastValidatedAt == now)
+        #expect(LicenseURLProtocol.responses.requests.map { $0.url?.path } == ["/licenses/activate", "/licenses/validate", "/licenses/validate"])
+    }
+
+    @Test("Failed seat rollback stays locked and retains an in-memory recovery path")
+    func pendingSaveAndRollbackFailure() async throws {
+        let (service, store) = try fixtures([
+            .init(body: #"{"id":"lki_fixture","product":{"product_id":"pdt_fixture"}}"#),
+            .init(error: .notConnectedToInternet)
+        ])
+        store.failSave = true
+        let controller = LicenseController(configuration: try configuration(), client: service, store: store, now: { now })
+        await controller.activate("fixture-license")
+        #expect(controller.status == .locked)
+        #expect(controller.issue == .storageRecovery)
+        #expect(controller.hasCredential)
+        #expect(!store.offlineAllowed)
+        #expect(store.value == nil)
+        #expect(LicenseURLProtocol.responses.requests.last?.url?.path == "/licenses/deactivate")
+        store.failSave = false
+        LicenseURLProtocol.responses.reset([.init(body: #"{"valid":true}"#)])
+        await controller.activate("fixture-license")
+        #expect(controller.status == .active)
+        #expect(store.value?.instanceID == "lki_fixture")
+        #expect(LicenseURLProtocol.responses.requests.map { $0.url?.path } == ["/licenses/validate"])
+    }
+
+    @Test("Entering a different key cannot overwrite an existing validated licence")
+    func existingLicenceReplacement() async throws {
+        let (service, store) = try fixtures([.init(body: #"{"valid":true}"#)])
+        store.value = credential()
+        let controller = LicenseController(configuration: try configuration(), client: service, store: store, now: { now })
+        await controller.restore()
+        let original = store.value
+        await controller.activate("different-fixture-key")
+        #expect(controller.status == .active)
+        #expect(store.value == original)
+        #expect(store.offlineAllowed)
+        #expect(controller.issue == .deactivateFirst)
+        #expect(LicenseURLProtocol.responses.requests.count == 1)
     }
 
     @Test("An activation without successful validation cannot obtain offline grace by retrying")

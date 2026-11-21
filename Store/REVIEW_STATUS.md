@@ -41,6 +41,6 @@ Follow Store/README.md to build, test, archive, and submit the store version. Re
 
 ## November 21 preparation update
 
-The direct-download test build now uses Dodo activation; the Mac App Store target compiles out that entire flow. The Store bundle checker verifies the exclusion alongside Sparkle and event-posting exclusion. The latest native suite has 93 passing tests (32 core and 61 app), including licensing boundary, Keychain and access-gate cases. No distribution-signed build or Apple review has happened. Earlier test counts above are historical evidence.
+The direct-download test build now uses Dodo activation; the Mac App Store target compiles out that entire flow. The Store bundle checker verifies the exclusion alongside Sparkle and event-posting exclusion. The latest native suite has 96 passing tests (32 core and 64 app), including licensing boundary, Keychain and access-gate cases. No distribution-signed build or Apple review has happened. Earlier test counts above are historical evidence.
 
 The website is a noindex prelaunch preview at https://kopy-website.vercel.app . Public unsigned downloads and live checkout remain unavailable. Google sign-in/account-deletion requirements do not apply because neither channel has customer accounts. Dodo purchase-data requests are a separate direct-channel support responsibility.

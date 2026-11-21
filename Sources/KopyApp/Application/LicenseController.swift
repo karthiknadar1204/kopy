@@ -32,7 +32,7 @@ struct LicenseCredential: Codable, Equatable, Sendable {
 }
 
 enum LicenseIssue: Error, Equatable, LocalizedError, Sendable {
-    case configuration, invalidKey, activationLimit, wrongProduct, connection, provider, malformed, storage
+    case configuration, invalidKey, activationLimit, wrongProduct, connection, provider, malformed, storage, storageRecovery, deactivateFirst
 
     var errorDescription: String? {
         switch self {
@@ -44,6 +44,8 @@ enum LicenseIssue: Error, Equatable, LocalizedError, Sendable {
         case .provider: "The licence service couldn’t complete the request. Please try again later."
         case .malformed: "The licence service returned an unexpected response. Please try again or contact support."
         case .storage: "Kopy couldn’t save its licence in Keychain. Allow Keychain access and try again."
+        case .storageRecovery: "Keychain save failed and the activation couldn’t be released. Keep Kopy open, allow Keychain access, then retry or deactivate."
+        case .deactivateFirst: "Deactivate this Mac before activating a different licence."
         }
     }
 }
@@ -134,6 +136,14 @@ final class LicenseController {
             issue = .invalidKey
             return
         }
+        if let credential, credential.key != key {
+            issue = .deactivateFirst
+            return
+        }
+        if credential != nil, status.permitsUse {
+            await refresh(force: true)
+            return
+        }
         isBusy = true
         epoch += 1
         let operation = epoch
@@ -141,17 +151,30 @@ final class LicenseController {
         defer { if epoch == operation { isBusy = false } }
         do {
             let next: LicenseCredential
+            let newlyAllocated: Bool
             if let existing = credential, existing.key == key {
                 next = existing
+                newlyAllocated = false
             } else {
                 let instance = try await client.activate(key: key)
                 next = LicenseCredential(key: key, instanceID: instance, productID: configuration.productID,
-                                         environment: configuration.environment, lastValidatedAt: now())
+                                         environment: configuration.environment, lastValidatedAt: .distantPast)
+                newlyAllocated = true
             }
-            guard epoch == operation, !Task.isCancelled else { return }
+            guard epoch == operation, !Task.isCancelled else {
+                if newlyAllocated { try? await client.deactivate(next) }
+                return
+            }
             store.offlineAllowed = false
             credential = next
             hasCredential = true
+            do { try store.save(next) } catch {
+                if newlyAllocated || next.lastValidatedAt == .distantPast {
+                    await releaseUnstoredActivation(next, client: client, operation: operation)
+                    return
+                }
+                throw LicenseIssue.storage
+            }
             guard try await client.validate(next) else { throw LicenseIssue.invalidKey }
             guard epoch == operation, !Task.isCancelled else { return }
             var verified = next
@@ -171,6 +194,24 @@ final class LicenseController {
             if issue == .invalidKey || issue == .wrongProduct { store.offlineAllowed = false }
             publish(.locked)
         }
+    }
+
+    private func releaseUnstoredActivation(_ pending: LicenseCredential, client: any LicenseServing, operation: Int) async {
+        let released: Bool
+        do { try await client.deactivate(pending); released = true }
+        catch { released = (error as? LicenseIssue) == .invalidKey }
+        guard epoch == operation else { return }
+        if released {
+            try? store.remove()
+            credential = nil
+            hasCredential = false
+            issue = .storage
+        } else {
+            credential = pending
+            hasCredential = true
+            issue = .storageRecovery
+        }
+        publish(.locked)
     }
 
     func refresh(force: Bool = false) async {
@@ -231,7 +272,16 @@ final class LicenseController {
         catch {
             if epoch == operation {
                 issue = error as? LicenseIssue ?? .provider
-                if issue == .invalidKey { store.offlineAllowed = false; publish(.locked) }
+                if issue == .invalidKey {
+                    store.offlineAllowed = false
+                    publish(.locked)
+                    do {
+                        try store.remove()
+                        self.credential = nil
+                        hasCredential = false
+                        issue = nil
+                    } catch { issue = .storage }
+                }
             }
         }
     }
